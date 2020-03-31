@@ -1,1 +1,17 @@
-<p>add-category works!</p>
+<div>
+  <p>Add a new category</p>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <mat-form-field>
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name" required>
+      <mat-error *ngIf="form.controls.name.hasError('required')">
+        required
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field formControlName="description">
+      <mat-label>Description</mat-label>
+      <textarea matInput></textarea>
+    </mat-form-field>
+  </form>
+</div>
