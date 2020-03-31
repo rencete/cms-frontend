@@ -12,6 +12,24 @@ describe('Test Api Utilities', () => {
     }
     expect(UrlUtils.createUrlFromParts(testUrl)).toBe("http://test.com:1234/api");
   });
+  
+  it('should create a proper URL from parts w/out port', () => {
+    const testUrl: UrlParts = {
+      protocol: "http",
+      domainName: "test.com",
+      path: "api"
+    }
+    expect(UrlUtils.createUrlFromParts(testUrl)).toBe("http://test.com/api");
+  });
+  
+  it('should create a proper URL from parts w/out path', () => {
+    const testUrl: UrlParts = {
+      protocol: "http",
+      domainName: "test.com",
+      port: 1234
+    }
+    expect(UrlUtils.createUrlFromParts(testUrl)).toBe("http://test.com:1234");
+  });
 
   it('should remove leading "/" from path when creating URL from parts', () => {
     const testUrl: UrlParts = {
