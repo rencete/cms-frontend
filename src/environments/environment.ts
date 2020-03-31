@@ -7,11 +7,11 @@ export const environment = {
 
   // API Server configuration
   // Expects json-server to be running
-  apiUrlSettings: {
+  apiUrlParts: {
     protocol: "http",
-    url: "localhost",
+    domainName: "localhost",
     port: 3000,
-    basePath: ""
+    path: ""
   }
 };
 
