@@ -13,5 +13,9 @@
       <mat-label>Description</mat-label>
       <textarea matInput></textarea>
     </mat-form-field>
+
+    <button mat-flat-button color="primary" type="submit" [disabled]="!form.valid">
+      Save
+    </button>
   </form>
 </div>
