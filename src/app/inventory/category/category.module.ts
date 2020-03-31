@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from "@angular/forms";
 import { FlexLayoutModule } from "@angular/flex-layout";
 
-import { AngularMaterialModule } from "@app/core/angular-material/angular-material.module";
+import { AngularMaterialModule } from "@core/angular-material/angular-material.module";
 import { AddCategoryComponent } from './add-category/add-category.component';
 
 
