@@ -4,9 +4,10 @@ import { UrlParts } from "../models/url-parts.interface";
 
 export class UrlUtils {
   static createUrlFromParts(url: UrlParts): string {
+    const protocol = url.protocol.replace(/:+/, "");
     const port = url.port ? ":" + url.port : "";
-    const path = (url.path || "").replace(/^\/+/, "");
-    return `${url.protocol}://${url.domainName}${port}${path && "/" + path}`;
+    const path = (url.pathname || "").replace(/^\/+/, "");
+    return `${protocol}://${url.hostname}${port}${path && "/" + path}`;
   };
 
   static appendPathToUrl(...paths: string[]): string {

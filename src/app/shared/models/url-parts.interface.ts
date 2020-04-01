@@ -1,6 +1,6 @@
 export interface UrlParts {
   protocol: string,
-  domainName: string,
+  hostname: string,
   port?: number,
-  path?: string
+  pathname?: string
 }

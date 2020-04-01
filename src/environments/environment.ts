@@ -9,9 +9,9 @@ export const environment = {
   // Expects json-server to be running
   apiUrlParts: {
     protocol: "http",
-    domainName: "localhost",
+    hostname: "localhost",
     port: 3000,
-    path: ""
+    pathName: ""
   }
 };
 

@@ -6,9 +6,9 @@ describe('Test URL path utilities', () => {
   it('should create a proper URL from parts', () => {
     const testUrl: UrlParts = {
       protocol: "http",
-      domainName: "test.com",
+      hostname: "test.com",
       port: 1234,
-      path: "api"
+      pathname: "api"
     }
     expect(UrlUtils.createUrlFromParts(testUrl)).toBe("http://test.com:1234/api");
   });
@@ -16,8 +16,8 @@ describe('Test URL path utilities', () => {
   it('should create a proper URL from parts w/out port', () => {
     const testUrl: UrlParts = {
       protocol: "http",
-      domainName: "test.com",
-      path: "api"
+      hostname: "test.com",
+      pathname: "api"
     }
     expect(UrlUtils.createUrlFromParts(testUrl)).toBe("http://test.com/api");
   });
@@ -25,18 +25,28 @@ describe('Test URL path utilities', () => {
   it('should create a proper URL from parts w/out path', () => {
     const testUrl: UrlParts = {
       protocol: "http",
-      domainName: "test.com",
+      hostname: "test.com",
       port: 1234
     }
     expect(UrlUtils.createUrlFromParts(testUrl)).toBe("http://test.com:1234");
   });
 
+  it('should remove trailinn ":" from protocol when creating URL from parts', () => {
+    const testUrl: UrlParts = {
+      protocol: "http:",
+      hostname: "test.com",
+      port: 1234,
+      pathname: "api"
+    }
+    expect(UrlUtils.createUrlFromParts(testUrl)).toBe("http://test.com:1234/api");
+  });
+
   it('should remove leading "/" from path when creating URL from parts', () => {
     const testUrl: UrlParts = {
       protocol: "http",
-      domainName: "test.com",
+      hostname: "test.com",
       port: 1234,
-      path: "/api"
+      pathname: "/api"
     }
     expect(UrlUtils.createUrlFromParts(testUrl)).toBe("http://test.com:1234/api");
   });
