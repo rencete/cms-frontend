@@ -2,7 +2,7 @@ import { UrlUtils } from './url-utils';
 
 import { UrlParts } from "../models/url-parts.interface";
 
-describe('Test Api Utilities', () => {
+describe('Test URL path utilities', () => {
   it('should create a proper URL from parts', () => {
     const testUrl: UrlParts = {
       protocol: "http",
@@ -45,6 +45,14 @@ describe('Test Api Utilities', () => {
     const testUrl: string = "http://test.com:1234/api";
     const path: string = "users"
     expect(UrlUtils.appendPathToUrl(testUrl, path)).toBe("http://test.com:1234/api/users");
+  });
+
+  it('should append multiple paths path to url', () => {
+    const testUrl: string = "http://test.com:1234/a";
+    const pathb: string = "b"
+    const pathc: string = "c"
+    const pathd: string = "d"
+    expect(UrlUtils.appendPathToUrl(testUrl, pathb, pathc, pathd)).toBe("http://test.com:1234/a/b/c/d");
   });
 
   it('should remove leading "/" from path when appending path to url', () => {

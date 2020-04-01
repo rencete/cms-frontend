@@ -1,3 +1,5 @@
+import * as urljoin from "url-join";
+
 import { UrlParts } from "../models/url-parts.interface";
 
 export class UrlUtils {
@@ -7,7 +9,7 @@ export class UrlUtils {
     return `${url.protocol}://${url.domainName}${port}${path && "/" + path}`;
   };
 
-  static appendPathToUrl(url: string, path: string): string {
-    return url.replace(/\/+$/, "") + "/" + path.replace(/^\/+/, "")
+  static appendPathToUrl(...paths: string[]): string {
+    return urljoin.apply(undefined, paths);
   }
 }
