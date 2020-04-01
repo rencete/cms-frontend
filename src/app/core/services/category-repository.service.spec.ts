@@ -4,6 +4,8 @@ import { CategoryRepositoryService } from './category-repository.service';
 import { HttpClient } from '@angular/common/http';
 import { of, Subject, Observable } from 'rxjs';
 import { Category } from '@app/shared/models/category.interface';
+import { UrlParts } from '@app/shared/models/url-parts.interface';
+import { API_URL_TOKEN } from './api-url.token';
 
 describe('CategoryRepositoryService tests', () => {
   let initValue: Category[] = [];
@@ -13,6 +15,8 @@ describe('CategoryRepositoryService tests', () => {
     put: jasmine.Spy,
     delete: jasmine.Spy
   };
+  let urlParts: UrlParts;
+  let urlFullPath: string;
   
   beforeEach(() => {
     initValue = [{
@@ -28,6 +32,16 @@ describe('CategoryRepositoryService tests', () => {
       name: "c",
       description: "desc c"
     }]
+  });
+
+  beforeEach(() => {
+    urlParts = {
+      protocol: "http",
+      hostname: "sub.main.domain",
+      port: 1234,
+      pathname: "a"
+    }
+    urlFullPath = "http://sub.main.domain:1234/a"
   });
 
   describe("API tests", () => {
@@ -53,7 +67,8 @@ describe('CategoryRepositoryService tests', () => {
       
       TestBed.configureTestingModule({
         providers: [
-          { provide: HttpClient, useValue: httpClientSpy }
+          { provide: HttpClient, useValue: httpClientSpy },
+          { provide: API_URL_TOKEN, useValue: urlParts }
         ]
       });
       service = TestBed.inject(CategoryRepositoryService);
@@ -62,7 +77,7 @@ describe('CategoryRepositoryService tests', () => {
     it('GET: ALL: Loads category data upon construction', async() => {  
       const result = await service.getAllCategories().toPromise()
       expect(httpClientSpy.get).toHaveBeenCalledTimes(1);
-      expect(httpClientSpy.get).toHaveBeenCalledWith("http://localhost:3000/category");
+      expect(httpClientSpy.get).toHaveBeenCalledWith(`${urlFullPath}/category`);
       expect(result).toEqual(initValue);
     });
   
@@ -71,14 +86,14 @@ describe('CategoryRepositoryService tests', () => {
       await service.getAllCategories().toPromise();
       const result = await service.getAllCategories().toPromise();
       expect(httpClientSpy.get).toHaveBeenCalledTimes(1);
-      expect(httpClientSpy.get).toHaveBeenCalledWith("http://localhost:3000/category");
+      expect(httpClientSpy.get).toHaveBeenCalledWith(`${urlFullPath}/category`);
       expect(result).toEqual(initValue);
     });
   
     it('GET: ID: Retrieves category data given id', async () => {  
       const result = await service.getCategory("2").toPromise();
       expect(httpClientSpy.get).toHaveBeenCalledTimes(1);
-      expect(httpClientSpy.get).toHaveBeenCalledWith("http://localhost:3000/category");
+      expect(httpClientSpy.get).toHaveBeenCalledWith(`${urlFullPath}/category`);
       expect(result).toEqual({
         id: "2",
         name: "b",
@@ -95,7 +110,7 @@ describe('CategoryRepositoryService tests', () => {
       };
       result = await service.upsertCategory(data).toPromise();
       expect(httpClientSpy.put).toHaveBeenCalledTimes(1);
-      expect(httpClientSpy.put).toHaveBeenCalledWith("http://localhost:3000/category/2", data);
+      expect(httpClientSpy.put).toHaveBeenCalledWith(`${urlFullPath}/category/2`, data);
       expect(result).toEqual({
         id: "2",
         name: "d",
@@ -123,7 +138,7 @@ describe('CategoryRepositoryService tests', () => {
       let result;
       result = await service.deleteCategory("2").toPromise();
       expect(httpClientSpy.delete).toHaveBeenCalledTimes(1);
-      expect(httpClientSpy.delete).toHaveBeenCalledWith("http://localhost:3000/category/2");      
+      expect(httpClientSpy.delete).toHaveBeenCalledWith(`${urlFullPath}/category/2`);      
 
       // Verify all the rest of data
       result = await service.getAllCategories().toPromise();
@@ -150,7 +165,8 @@ describe('CategoryRepositoryService tests', () => {
       
       TestBed.configureTestingModule({
         providers: [
-          { provide: HttpClient, useValue: httpClientSpy }
+          { provide: HttpClient, useValue: httpClientSpy },
+          { provide: API_URL_TOKEN, useValue: urlParts }
         ]
       });
       service = TestBed.inject(CategoryRepositoryService);

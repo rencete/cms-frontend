@@ -1,11 +1,12 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
 import { Category } from '@app/shared/models/category.interface';
 import { Observable, of, Subject } from 'rxjs';
 import { map, tap } from "rxjs/operators";
 
-import { environment } from "@environments/environment";
+import { API_URL_TOKEN } from "./api-url.token";
 import { UrlUtils } from "@shared/utils/url-utils";
+import { UrlParts } from '@app/shared/models/url-parts.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -15,9 +16,11 @@ export class CategoryRepositoryService {
   private loaded: boolean = false; // becomes true when initial load completed
   private loadedSubject: Subject<boolean> = new Subject<boolean>();
   private loaded$ = this.loadedSubject.asObservable();
-  private apiUrl: string = UrlUtils.createUrlFromParts(environment.apiUrlParts);
+  private apiUrl: string;
 
-  constructor(public http: HttpClient) {
+  constructor(@Inject(API_URL_TOKEN) public urlParts: UrlParts, public http: HttpClient) {
+    this.apiUrl = UrlUtils.createUrlFromParts(urlParts);
+
     this.http.get<Category[]>(UrlUtils.appendPathToUrl(this.apiUrl, "category")).subscribe((data) => {
       this.categories = data;
       this.loaded = true;
