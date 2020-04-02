@@ -2,7 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AddCategoryComponent } from './add-category.component';
 
-describe('AddCategoryComponent', () => {
+xdescribe('AddCategoryComponent', () => {
   let component: AddCategoryComponent;
   let fixture: ComponentFixture<AddCategoryComponent>;
 

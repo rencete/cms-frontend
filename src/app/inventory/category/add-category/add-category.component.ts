@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { FormControl, FormGroup, Validators } from "@angular/forms";
+import { CategoryModel } from '../models/category.model';
 
 @Component({
   selector: 'app-add-category',
@@ -7,6 +8,8 @@ import { FormControl, FormGroup, Validators } from "@angular/forms";
   styleUrls: ['./add-category.component.css']
 })
 export class AddCategoryComponent {
+  constructor(private model: CategoryModel) { }
+
   // Form controls
   form: FormGroup = new FormGroup({
     name: new FormControl('', [
@@ -16,7 +19,7 @@ export class AddCategoryComponent {
   })
 
   onSubmit() {
-    
+    const values = this.form.value;
+    this.model.addCategory(values.name, values.description);
   }
-
 }

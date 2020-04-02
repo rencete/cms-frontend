@@ -9,9 +9,9 @@
       </mat-error>
     </mat-form-field>
 
-    <mat-form-field formControlName="description">
+    <mat-form-field>
       <mat-label>Description</mat-label>
-      <textarea matInput></textarea>
+      <textarea matInput formControlName="description"></textarea>
     </mat-form-field>
 
     <button mat-flat-button color="primary" type="submit" [disabled]="!form.valid">
