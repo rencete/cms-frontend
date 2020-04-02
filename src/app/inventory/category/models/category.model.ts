@@ -1,11 +1,21 @@
+import { Injectable } from '@angular/core';
 import { nanoid } from "nanoid";
 
+import { CategoryRepositoryService } from "@core/services/category-repository.service";
 import { Category } from "@shared/models/category.interface";
+import { Observable } from 'rxjs';
 
-export class CategoryModel implements Category {
-  id: string;
+@Injectable()
+export class CategoryModel {
+  constructor(private repository: CategoryRepositoryService) {
+  }
 
-  constructor(public name: string, public description: string) {
-    this.id = nanoid();
+  addCategory(name: string, description: string = ""): Observable<Category> {
+    let newCategory: Category = {
+      name: name,
+      description: description,
+      id: nanoid()
+    };
+    return this.repository.upsertCategory(newCategory);
   }
 }
