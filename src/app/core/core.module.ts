@@ -12,7 +12,7 @@ import { API_URL_TOKEN } from "./services/api-url.token";
     HttpClientModule
   ],
   providers: [
-    { provide: API_URL_TOKEN, useValue: () => environment.apiUrlParts }
+    { provide: API_URL_TOKEN, useValue: environment.apiUrlParts }
   ]
 })
 export class CoreModule { }
