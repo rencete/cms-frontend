@@ -1,12 +1,12 @@
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
-import { Category } from '@app/shared/models/category.interface';
-import { Observable, of, Subject } from 'rxjs';
-import { map, tap } from "rxjs/operators";
+import { Observable, of, Subject, throwError } from 'rxjs';
+import { map, tap, catchError } from "rxjs/operators";
 
 import { API_URL_TOKEN } from "./api-url.token";
 import { UrlUtils } from "@shared/utils/url-utils";
 import { UrlParts } from '@app/shared/models/url-parts.interface';
+import { Category } from '@app/shared/models/category.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -49,18 +49,19 @@ export class CategoryRepositoryService {
     } else {
       return this.initialLoadCompleted$
         .pipe(
-          map(() => this.cachedCategories)
+          map(() => this.cachedCategories),
+          catchError(err => throwError(err))
         );
     }
   }
 
   getCategory(categoryId: string): Observable<Category> {
     if (this.initialLoadCompleted) {
-      return of(this.cachedCategories.find(category => category.id === categoryId));
+      return this.getCategoryWithIdOrError(categoryId);
     } else {
       return this.initialLoadCompleted$
         .pipe(
-          map(() => this.cachedCategories.find(category => category.id === categoryId))
+          () => this.getCategoryWithIdOrError(categoryId)
         );
     }
   }
@@ -77,12 +78,24 @@ export class CategoryRepositoryService {
     return this.deleteCategoryAndUpdateCache(categoryId);
   }
 
+  private getCategoryWithIdOrError(categoryId: string): Observable<Category> {
+    const category = this.cachedCategories.find(c => c.id === categoryId);
+    if(category) {
+      return of(category);
+    } else {
+      return throwError(new Error("Not Found"));
+    }
+  }
+
   private postCategoryAndUpdateCache(category: Category): Observable<Category> {
     let obs = this.http.post<Category>(this.restApiUrl, category);
-    obs.pipe(
+    obs = obs.pipe(
       tap(() => {
         this.addOrUpdateCache(category);
-      }));
+      },
+      catchError((error) => {
+        return throwError(error);
+      })));
     return obs;
   }
 
@@ -92,7 +105,10 @@ export class CategoryRepositoryService {
     obs = obs.pipe(
       tap(() => {
         this.addOrUpdateCache(category);
-      }));
+      },
+      catchError((error) => {
+        return throwError(error);
+      })));
     return obs;
   }
 
@@ -112,7 +128,10 @@ export class CategoryRepositoryService {
     obs = obs.pipe(
       tap(() => {
         this.deleteFromCache(categoryId);
-      }));
+      },
+      catchError((error) => {
+        return throwError(error);
+      })));
     return obs;
   }
 

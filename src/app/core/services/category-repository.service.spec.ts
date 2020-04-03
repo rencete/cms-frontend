@@ -1,25 +1,26 @@
 import { TestBed } from '@angular/core/testing';
+import { HttpClient } from '@angular/common/http';
+import { of, Subject } from 'rxjs';
 
 import { CategoryRepositoryService } from './category-repository.service';
-import { HttpClient } from '@angular/common/http';
-import { of, Subject, Observable } from 'rxjs';
 import { Category } from '@app/shared/models/category.interface';
 import { UrlParts } from '@app/shared/models/url-parts.interface';
 import { API_URL_TOKEN } from './api-url.token';
 
 describe('CategoryRepositoryService tests', () => {
-  let initValue: Category[] = [];
+  let initialCategoryValues: Category[] = [];
   let service: CategoryRepositoryService;
   let httpClientSpy: {
     get: jasmine.Spy,
+    post: jasmine.Spy,
     put: jasmine.Spy,
     delete: jasmine.Spy
   };
   let urlParts: UrlParts;
   let urlFullPath: string;
-  
+
   beforeEach(() => {
-    initValue = [{
+    initialCategoryValues = [{
       id: "1",
       name: "a",
       description: "desc a"
@@ -41,30 +42,16 @@ describe('CategoryRepositoryService tests', () => {
       port: 1234,
       pathname: "a"
     }
-    urlFullPath = "http://sub.main.domain:1234/a"
+    urlFullPath = "http://sub.main.domain:1234/a/category"
   });
 
-  describe("API tests", () => {
+  describe("REST API success tests", () => {
     beforeEach(() => {
-      httpClientSpy = jasmine.createSpyObj('HttpClient', ['get', 'put', 'delete']);
+      httpClientSpy = jasmine.createSpyObj('HttpClient', ['get', 'post', 'put', 'delete']);
       httpClientSpy.get.and.callFake(() => {
-        return of(initValue);
+        return of(initialCategoryValues);
       });
-      httpClientSpy.put.and.callFake(() => {
-        return of({
-          id: "2",
-          name: "d",
-          description: "desc d"
-        });
-      });
-      httpClientSpy.delete.and.callFake(() => {
-        return of({
-          id: "2",
-          name: "b",
-          description: "desc b"
-        });
-      });
-      
+
       TestBed.configureTestingModule({
         providers: [
           { provide: HttpClient, useValue: httpClientSpy },
@@ -73,96 +60,115 @@ describe('CategoryRepositoryService tests', () => {
       });
       service = TestBed.inject(CategoryRepositoryService);
     })
-  
-    it('GET: ALL: Loads category data upon construction', async() => {  
+
+    it('GET: Retrieve all categories', async () => {
       const result = await service.getCategories().toPromise()
       expect(httpClientSpy.get).toHaveBeenCalledTimes(1);
-      expect(httpClientSpy.get).toHaveBeenCalledWith(`${urlFullPath}/category`);
-      expect(result).toEqual(initValue);
+      expect(httpClientSpy.get).toHaveBeenCalledWith(`${urlFullPath}`);
+      expect(result).toEqual(initialCategoryValues);
     });
-  
-    it('GET: ALL: Retrieves from cache for multiple calls to getAllCategories', async() => {  
-      await service.getCategories().toPromise();
-      await service.getCategories().toPromise();
-      const result = await service.getCategories().toPromise();
-      expect(httpClientSpy.get).toHaveBeenCalledTimes(1);
-      expect(httpClientSpy.get).toHaveBeenCalledWith(`${urlFullPath}/category`);
-      expect(result).toEqual(initValue);
-    });
-  
-    it('GET: ID: Retrieves category data given id', async () => {  
+
+    it('GET: Retrieves category data given ID', async () => {
       const result = await service.getCategory("2").toPromise();
       expect(httpClientSpy.get).toHaveBeenCalledTimes(1);
-      expect(httpClientSpy.get).toHaveBeenCalledWith(`${urlFullPath}/category`);
+      expect(httpClientSpy.get).toHaveBeenCalledWith(`${urlFullPath}`);
       expect(result).toEqual({
         id: "2",
         name: "b",
         description: "desc b"
       });
     });
-  
-    it('PUT: Updates category data', async () => {  
-      let result;
-      var data = {
+
+    it('POST: Adds category data', async () => {
+      let postData = {
+        id: "4",
+        name: "d",
+        description: "desc d"
+      };
+
+      httpClientSpy.post.and.callFake(() => {
+        return of(postData);
+      });
+
+      await expectAsync(service.getCategory("4").toPromise())
+        .toBeRejectedWith(new Error("Not Found"));
+
+      await expectAsync(service.addCategory(postData).toPromise()).toBeResolved();
+      expect(httpClientSpy.post).toHaveBeenCalledTimes(1);
+      expect(httpClientSpy.post).toHaveBeenCalledWith(`${urlFullPath}`, postData);
+
+      const allCategories = await service.getCategories().toPromise();
+      expect(allCategories.length).toBe(4);
+      expect(allCategories.find(c => c.id === postData.id)).toEqual(postData);
+    });
+
+    it('PUT: Updates category data', async () => {
+      let putData = {
         id: "2",
         name: "d",
         description: "desc d"
       };
-      result = await service.updateCategory(data).toPromise();
-      expect(httpClientSpy.put).toHaveBeenCalledTimes(1);
-      expect(httpClientSpy.put).toHaveBeenCalledWith(`${urlFullPath}/category/2`, data);
-      expect(result).toEqual({
-        id: "2",
-        name: "d",
-        description: "desc d"
+
+      httpClientSpy.put.and.callFake(() => {
+        return of(putData);
       });
 
-      // Verify all the rest of data
-      result = await service.getCategories().toPromise();
-      expect(result).toEqual([{
-        id: "1",
-        name: "a",
-        description: "desc a"
-      }, {
-        id: "2",
-        name: "d",
-        description: "desc d"
-      }, {
-        id: "3",
-        name: "c",
-        description: "desc c"
-      }]);
-    });
-  
-    it('DELETE: Deletes category data given id', async () => {  
-      let result;
-      result = await service.deleteCategory("2").toPromise();
-      expect(httpClientSpy.delete).toHaveBeenCalledTimes(1);
-      expect(httpClientSpy.delete).toHaveBeenCalledWith(`${urlFullPath}/category/2`);      
+      await expectAsync(service.getCategory("2").toPromise())
+        .toBeResolvedTo(initialCategoryValues.find(c => c.id === "2"));
 
-      // Verify all the rest of data
-      result = await service.getCategories().toPromise();
-      expect(result).toEqual([{
-        id: "1",
-        name: "a",
-        description: "desc a"
-      }, {
-        id: "3",
-        name: "c",
-        description: "desc c"
-      }]);
+      await expectAsync(service.updateCategory(putData).toPromise()).toBeResolved();
+      expect(httpClientSpy.put).toHaveBeenCalledTimes(1);
+      expect(httpClientSpy.put).toHaveBeenCalledWith(`${urlFullPath}/2`, putData);
+
+      const allCategories = await service.getCategories().toPromise();
+      expect(allCategories.length).toBe(3);
+      expect(allCategories.find(c => c.id === putData.id)).toEqual(putData);
     });
-  })
-  
+
+    it('DELETE: Deletes category data given id', async () => {
+      httpClientSpy.delete.and.callFake(() => {
+        return of({});
+      });
+
+      await expectAsync(service.getCategory("2").toPromise())
+        .toBeResolvedTo(initialCategoryValues.find(c => c.id === "2"));
+
+      await expectAsync(service.deleteCategory("2").toPromise()).toBeResolved();
+      expect(httpClientSpy.delete).toHaveBeenCalledTimes(1);
+      expect(httpClientSpy.delete).toHaveBeenCalledWith(`${urlFullPath}/2`);
+
+      await expectAsync(service.getCategory("2").toPromise())
+        .toBeRejectedWith(new Error("Not Found"));
+    });
+
+    it('Retrieves from cache for multiple calls to getAllCategories', async () => {
+      await expectAsync(service.getCategories().toPromise()).toBeResolvedTo(initialCategoryValues);
+      await expectAsync(service.getCategories().toPromise()).toBeResolvedTo(initialCategoryValues);
+      const result = await service.getCategories().toPromise();
+      expect(httpClientSpy.get).toHaveBeenCalledTimes(1);
+      expect(httpClientSpy.get).toHaveBeenCalledWith(`${urlFullPath}`);
+      expect(result).toEqual(initialCategoryValues);
+    });
+
+    it('Throw error when GET data of non-existent ID', async () => {
+      await expectAsync(service.getCategory("4").toPromise())
+        .toBeRejectedWith(new Error("Not Found"));
+      await expectAsync(service.getCategory("Test").toPromise())
+        .toBeRejectedWith(new Error("Not Found"));
+      await expectAsync(service.getCategory("0").toPromise())
+        .toBeRejectedWith(new Error("Not Found"));
+    });
+  });
+
   describe("Timing tests", () => {
-    it('Waits for the loading to complete before returning data', done => {
+    it('Wait for the loading to complete before returning data', done => {
       let obs: Subject<Category[]> = new Subject<Category[]>();
-  
+
       httpClientSpy = jasmine.createSpyObj('HttpClient', ['get']);
       httpClientSpy.get.and.callFake(() => {
         return obs.asObservable();
       });
-      
+
       TestBed.configureTestingModule({
         providers: [
           { provide: HttpClient, useValue: httpClientSpy },
@@ -170,16 +176,16 @@ describe('CategoryRepositoryService tests', () => {
         ]
       });
       service = TestBed.inject(CategoryRepositoryService);
-  
+
       expect(httpClientSpy.get).toHaveBeenCalledTimes(1);
-  
+
       service.getCategories().subscribe(result => {
         expect(httpClientSpy.get).toHaveBeenCalledTimes(1);
-        expect(result).toEqual(initValue);
+        expect(result).toEqual(initialCategoryValues);
         done();
       });
-  
-      obs.next(initValue);
+
+      obs.next(initialCategoryValues);
     });
   });
 });
