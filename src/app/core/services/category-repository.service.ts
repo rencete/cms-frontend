@@ -12,7 +12,7 @@ import { UrlParts } from '@app/shared/models/url-parts.interface';
   providedIn: 'root'
 })
 export class CategoryRepositoryService {
-  private categories: Category[];
+  private cachedCategories: Category[];
   private initialLoadCompleted: boolean = false;
   private initialLoadCompletedSubject: Subject<boolean> = new Subject<boolean>();
   private initialLoadCompleted$ = this.initialLoadCompletedSubject.asObservable();
@@ -32,7 +32,7 @@ export class CategoryRepositoryService {
 
   private loadInitialCategoryData() {
     this.http.get<Category[]>(this.restApiUrl).subscribe((data) => {
-      this.categories = data;
+      this.cachedCategories = data;
       this.setInitialLoadCompleted();
     });
   }
@@ -45,69 +45,81 @@ export class CategoryRepositoryService {
 
   getCategories(): Observable<Category[]> {
     if (this.initialLoadCompleted) {
-      return of(this.categories);
+      return of(this.cachedCategories);
     } else {
-      return this.initialLoadCompleted$.pipe(map(() => this.categories));
+      return this.initialLoadCompleted$
+        .pipe(
+          map(() => this.cachedCategories)
+        );
     }
   }
 
-  getCategory(id: string): Observable<Category> {
+  getCategory(categoryId: string): Observable<Category> {
     if (this.initialLoadCompleted) {
-      return of(this.categories.find(category => category.id === id));
+      return of(this.cachedCategories.find(category => category.id === categoryId));
     } else {
-      return this.initialLoadCompleted$.pipe(
-        map(() => this.categories.find(category => category.id === id))
-      );
+      return this.initialLoadCompleted$
+        .pipe(
+          map(() => this.cachedCategories.find(category => category.id === categoryId))
+        );
     }
   }
 
   addCategory(category: Category): Observable<Category> {
-    let index = -1;
-
-    return this.http.post<Category>(this.restApiUrl, category).pipe(
-      tap(() => {
-        index = this.categories.findIndex(c => c.id === category.id);
-        if (index !== -1) {
-          this.categories.splice(index, 1, category);
-        }
-        else {
-          this.categories.push(category);
-        }
-      })
-    );
+    return this.postCategoryAndUpdateCache(category);
   }
 
   updateCategory(category: Category): Observable<Category> {
-    let index = -1;
-
-    return this.http.put<Category>(
-      UrlUtils.appendPathToUrl(this.restApiUrl, category.id),
-      category
-    ).pipe(
-      tap(() => {
-        index = this.categories.findIndex(c => c.id === category.id);
-        if (index !== -1) {
-          this.categories.splice(index, 1, category);
-        }
-        else {
-          this.categories.push(category);
-        }
-      })
-    );
+    return this.putCategoryAndUpdateCache(category);
   }
 
-  deleteCategory(id: string): Observable<Category> {
-    let index = -1;
+  deleteCategory(categoryId: string): Observable<Category> {
+    return this.deleteCategoryAndUpdateCache(categoryId);
+  }
 
-    return this.http.delete<Category>(
-      UrlUtils.appendPathToUrl(this.restApiUrl, id)
-    ).pipe(
+  private postCategoryAndUpdateCache(category: Category): Observable<Category> {
+    let obs = this.http.post<Category>(this.restApiUrl, category);
+    obs.pipe(
       tap(() => {
-        index = this.categories.findIndex(c => c.id === id);
-        if (index !== -1) {
-          this.categories.splice(index, 1);
-        }
-      })
-    );
+        this.addOrUpdateCache(category);
+      }));
+    return obs;
+  }
+
+  private putCategoryAndUpdateCache(category: Category): Observable<Category> {
+    let putApiUrl = UrlUtils.appendPathToUrl(this.restApiUrl, category.id);
+    let obs = this.http.put<Category>(putApiUrl, category)
+    obs = obs.pipe(
+      tap(() => {
+        this.addOrUpdateCache(category);
+      }));
+    return obs;
+  }
+
+  private addOrUpdateCache(category: Category): void {
+    const index = this.cachedCategories.findIndex(c => c.id === category.id);
+    if (index !== -1) {
+      this.cachedCategories.splice(index, 1, category);
+    }
+    else {
+      this.cachedCategories.push(category);
+    }
+  }
+
+  private deleteCategoryAndUpdateCache(categoryId: string): Observable<Category> {
+    const deleteApiUrl = UrlUtils.appendPathToUrl(this.restApiUrl, categoryId);
+    let obs = this.http.delete<Category>(deleteApiUrl);
+    obs = obs.pipe(
+      tap(() => {
+        this.deleteFromCache(categoryId);
+      }));
+    return obs;
+  }
+
+  private deleteFromCache(categoryId: string): void {
+    const index = this.cachedCategories.findIndex(c => c.id === categoryId);
+    if (index !== -1) {
+      this.cachedCategories.splice(index, 1);
+    }
   }
 }

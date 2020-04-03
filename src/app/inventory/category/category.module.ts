@@ -5,9 +5,6 @@ import { FlexLayoutModule } from "@angular/flex-layout";
 
 import { AngularMaterialModule } from "@core/angular-material/angular-material.module";
 import { AddCategoryComponent } from './add-category/add-category.component';
-import { CategoryModel } from './models/category.model';
-
-
 
 @NgModule({
   declarations: [
@@ -21,9 +18,6 @@ import { CategoryModel } from './models/category.model';
   ],
   exports: [
     AddCategoryComponent
-  ],
-  providers: [
-    CategoryModel
   ]
 })
 export class CategoryModule { }

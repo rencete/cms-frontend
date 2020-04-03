@@ -1,6 +1,6 @@
 <div>
   <p>Add a new category</p>
-  <form fxLayout='column' [formGroup]="form" (ngSubmit)="onSubmit()">
+  <form fxLayout='column' [formGroup]="form" (ngSubmit)="addCategory()">
     <mat-form-field>
       <mat-label>Name</mat-label>
       <input matInput formControlName="name" required>
