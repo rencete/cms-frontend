@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { FormControl, FormGroup, Validators } from "@angular/forms";
-import { CategoryModel } from '../models/category.model';
+
+import { CategoryRepositoryService } from '@app/core/services/category-repository.service';
+import { Category } from '@app/shared/models/category.interface';
 
 @Component({
   selector: 'app-add-category',
@@ -8,9 +10,6 @@ import { CategoryModel } from '../models/category.model';
   styleUrls: ['./add-category.component.css']
 })
 export class AddCategoryComponent {
-  constructor(private model: CategoryModel) { }
-
-  // Form controls
   form: FormGroup = new FormGroup({
     name: new FormControl('', [
       Validators.required
@@ -18,8 +17,15 @@ export class AddCategoryComponent {
     description: new FormControl()
   })
 
-  onSubmit() {
+  constructor(private repository: CategoryRepositoryService) { }
+
+  addCategory() {
     const values = this.form.value;
-    this.model.addCategory(values.name, values.description);
+    const newCategory: Category = {
+      id : "", // ID is set by the server
+      name: values.name,
+      description: values.description
+    }
+    this.repository.addCategory(newCategory).subscribe();
   }
 }

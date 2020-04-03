@@ -13,45 +13,75 @@ import { UrlParts } from '@app/shared/models/url-parts.interface';
 })
 export class CategoryRepositoryService {
   private categories: Category[];
-  private loaded: boolean = false; // becomes true when initial load completed
-  private loadedSubject: Subject<boolean> = new Subject<boolean>();
-  private loaded$ = this.loadedSubject.asObservable();
-  private apiUrl: string;
+  private initialLoadCompleted: boolean = false;
+  private initialLoadCompletedSubject: Subject<boolean> = new Subject<boolean>();
+  private initialLoadCompleted$ = this.initialLoadCompletedSubject.asObservable();
+  private restApiUrl: string;
+
+  private CATEGORY_URL_BASE_PATH = "category";
 
   constructor(@Inject(API_URL_TOKEN) public urlParts: UrlParts, public http: HttpClient) {
-    this.apiUrl = UrlUtils.createUrlFromParts(urlParts);
+    this.setRestApiUrl();
+    this.loadInitialCategoryData();
+  }
 
-    this.http.get<Category[]>(UrlUtils.appendPathToUrl(this.apiUrl, "category")).subscribe((data) => {
+  private setRestApiUrl() {
+    const urlBase: string = UrlUtils.createUrlFromParts(this.urlParts);
+    this.restApiUrl = UrlUtils.appendPathToUrl(urlBase, this.CATEGORY_URL_BASE_PATH);
+  }
+
+  private loadInitialCategoryData() {
+    this.http.get<Category[]>(this.restApiUrl).subscribe((data) => {
       this.categories = data;
-      this.loaded = true;
-      this.loadedSubject.next(true);
-      this.loadedSubject.complete();
+      this.setInitialLoadCompleted();
     });
   }
 
-  getAllCategories(): Observable<Category[]> {
-    if (this.loaded) {
+  private setInitialLoadCompleted() {
+    this.initialLoadCompleted = true;
+    this.initialLoadCompletedSubject.next(this.initialLoadCompleted);
+    this.initialLoadCompletedSubject.complete();
+  }
+
+  getCategories(): Observable<Category[]> {
+    if (this.initialLoadCompleted) {
       return of(this.categories);
     } else {
-      return this.loaded$.pipe(map(() => this.categories));
+      return this.initialLoadCompleted$.pipe(map(() => this.categories));
     }
   }
 
   getCategory(id: string): Observable<Category> {
-    if (this.loaded) {
+    if (this.initialLoadCompleted) {
       return of(this.categories.find(category => category.id === id));
     } else {
-      return this.loaded$.pipe(
+      return this.initialLoadCompleted$.pipe(
         map(() => this.categories.find(category => category.id === id))
       );
     }
   }
 
-  upsertCategory(category: Category): Observable<Category> {
+  addCategory(category: Category): Observable<Category> {
+    let index = -1;
+
+    return this.http.post<Category>(this.restApiUrl, category).pipe(
+      tap(() => {
+        index = this.categories.findIndex(c => c.id === category.id);
+        if (index !== -1) {
+          this.categories.splice(index, 1, category);
+        }
+        else {
+          this.categories.push(category);
+        }
+      })
+    );
+  }
+
+  updateCategory(category: Category): Observable<Category> {
     let index = -1;
 
     return this.http.put<Category>(
-      UrlUtils.appendPathToUrl(this.apiUrl, "category", category.id),
+      UrlUtils.appendPathToUrl(this.restApiUrl, category.id),
       category
     ).pipe(
       tap(() => {
@@ -70,7 +100,7 @@ export class CategoryRepositoryService {
     let index = -1;
 
     return this.http.delete<Category>(
-      UrlUtils.appendPathToUrl(this.apiUrl, "category", id)
+      UrlUtils.appendPathToUrl(this.restApiUrl, id)
     ).pipe(
       tap(() => {
         index = this.categories.findIndex(c => c.id === id);

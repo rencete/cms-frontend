@@ -75,16 +75,16 @@ describe('CategoryRepositoryService tests', () => {
     })
   
     it('GET: ALL: Loads category data upon construction', async() => {  
-      const result = await service.getAllCategories().toPromise()
+      const result = await service.getCategories().toPromise()
       expect(httpClientSpy.get).toHaveBeenCalledTimes(1);
       expect(httpClientSpy.get).toHaveBeenCalledWith(`${urlFullPath}/category`);
       expect(result).toEqual(initValue);
     });
   
     it('GET: ALL: Retrieves from cache for multiple calls to getAllCategories', async() => {  
-      await service.getAllCategories().toPromise();
-      await service.getAllCategories().toPromise();
-      const result = await service.getAllCategories().toPromise();
+      await service.getCategories().toPromise();
+      await service.getCategories().toPromise();
+      const result = await service.getCategories().toPromise();
       expect(httpClientSpy.get).toHaveBeenCalledTimes(1);
       expect(httpClientSpy.get).toHaveBeenCalledWith(`${urlFullPath}/category`);
       expect(result).toEqual(initValue);
@@ -108,7 +108,7 @@ describe('CategoryRepositoryService tests', () => {
         name: "d",
         description: "desc d"
       };
-      result = await service.upsertCategory(data).toPromise();
+      result = await service.updateCategory(data).toPromise();
       expect(httpClientSpy.put).toHaveBeenCalledTimes(1);
       expect(httpClientSpy.put).toHaveBeenCalledWith(`${urlFullPath}/category/2`, data);
       expect(result).toEqual({
@@ -118,7 +118,7 @@ describe('CategoryRepositoryService tests', () => {
       });
 
       // Verify all the rest of data
-      result = await service.getAllCategories().toPromise();
+      result = await service.getCategories().toPromise();
       expect(result).toEqual([{
         id: "1",
         name: "a",
@@ -141,7 +141,7 @@ describe('CategoryRepositoryService tests', () => {
       expect(httpClientSpy.delete).toHaveBeenCalledWith(`${urlFullPath}/category/2`);      
 
       // Verify all the rest of data
-      result = await service.getAllCategories().toPromise();
+      result = await service.getCategories().toPromise();
       expect(result).toEqual([{
         id: "1",
         name: "a",
@@ -173,7 +173,7 @@ describe('CategoryRepositoryService tests', () => {
   
       expect(httpClientSpy.get).toHaveBeenCalledTimes(1);
   
-      service.getAllCategories().subscribe(result => {
+      service.getCategories().subscribe(result => {
         expect(httpClientSpy.get).toHaveBeenCalledTimes(1);
         expect(result).toEqual(initValue);
         done();
