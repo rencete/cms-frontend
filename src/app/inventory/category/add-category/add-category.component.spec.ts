@@ -3,9 +3,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 
 import { AddCategoryComponent } from './add-category.component';
 import { CategoryRepositoryService } from '@app/core/services/category-repository.service';
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { By } from '@angular/platform-browser';
+import { setElementValueWithInputEvent } from "@shared/testing/common-utils";
 
 describe('AddCategoryComponent', () => {
   let componentUnderTest: AddCategoryComponent;
@@ -23,8 +21,7 @@ describe('AddCategoryComponent', () => {
         AddCategoryComponent
       ],
       imports: [
-        ReactiveFormsModule,
-        CommonModule
+        ReactiveFormsModule
       ],
       providers: [
         { provide: CategoryRepositoryService, useValue: mock }
@@ -57,25 +54,15 @@ describe('AddCategoryComponent', () => {
   });
 
   it('Submit button is enabled when name is not empty', () => {
-    setNameInputValue("a");
+    setElementValueWithInputEvent<HTMLInputElement>(nameInput, "a");
+    fixture.detectChanges();
 
     expect(submitButton.disabled).toBe(false);
   });
 
-  function setNameInputValue(value: string) {
-    nameInput.value = value;
-    nameInput.dispatchEvent(newEvent('input'));
-    fixture.detectChanges();
-  }
-
-  function newEvent(eventName: string, bubbles = false, cancelable = false) {
-    let evt = document.createEvent('CustomEvent');  // MUST be 'CustomEvent'
-    evt.initCustomEvent(eventName, bubbles, cancelable, null);
-    return evt;
-  }
-
   it('Clicking submit button calls service.addCategory', () => {
-    setNameInputValue("a");
+    setElementValueWithInputEvent<HTMLInputElement>(nameInput, "a");
+    fixture.detectChanges();
     expect(mockRepositoryService.addCategory).not.toHaveBeenCalled();
     submitButton.click();
 
@@ -83,7 +70,8 @@ describe('AddCategoryComponent', () => {
   });
 
   it('Submit sends correct name to be added', () => {
-    setNameInputValue("a");
+    setElementValueWithInputEvent<HTMLInputElement>(nameInput, "a");
+    fixture.detectChanges();
     submitButton.click();
 
     expect(mockRepositoryService.addCategory).toHaveBeenCalledWith({
@@ -94,8 +82,9 @@ describe('AddCategoryComponent', () => {
   });
 
   it('Submit sends correct description to be added', () => {
-    setNameInputValue("a");
-    setDescriptionTextAreaValue("b");
+    setElementValueWithInputEvent<HTMLInputElement>(nameInput, "a");
+    setElementValueWithInputEvent<HTMLTextAreaElement>(descriptionTextArea, "b");
+    fixture.detectChanges();
     submitButton.click();
 
     expect(mockRepositoryService.addCategory).toHaveBeenCalledWith({
@@ -104,10 +93,4 @@ describe('AddCategoryComponent', () => {
       description: "b"
     });
   });
-
-  function setDescriptionTextAreaValue(value: string) {
-    descriptionTextArea.value = value;
-    descriptionTextArea.dispatchEvent(newEvent('input'));
-    fixture.detectChanges();
-  }
 });
