@@ -24,7 +24,7 @@ export class AddCategoryComponent {
     const newCategory: Category = {
       id : "", // ID is set by the server
       name: values.name,
-      description: values.description
+      description: values.description || ""
     }
     this.repository.addCategory(newCategory).subscribe();
   }
