@@ -1,14 +1,17 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AddCategoryComponent } from './add-category.component';
 import { CategoryRepositoryService } from '@app/core/services/category-repository.service';
 import { setElementValueWithInputEvent } from "@shared/testing/common-utils";
+import { AngularMaterialModule } from '@app/core/angular-material/angular-material.module';
 
 describe('AddCategoryComponent', () => {
   let componentUnderTest: AddCategoryComponent;
   let fixture: ComponentFixture<AddCategoryComponent>;
   let mockRepositoryService: CategoryRepositoryService;
+  let componentNativeElement: HTMLElement;
   let nameInput: HTMLInputElement;
   let descriptionTextArea: HTMLTextAreaElement;
   let submitButton: HTMLButtonElement;
@@ -21,7 +24,9 @@ describe('AddCategoryComponent', () => {
         AddCategoryComponent
       ],
       imports: [
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        AngularMaterialModule,
+        NoopAnimationsModule
       ],
       providers: [
         { provide: CategoryRepositoryService, useValue: mock }
@@ -35,7 +40,7 @@ describe('AddCategoryComponent', () => {
     componentUnderTest = fixture.componentInstance;
     mockRepositoryService = fixture.debugElement.injector.get(CategoryRepositoryService);
 
-    const componentNativeElement: HTMLElement = fixture.debugElement.nativeElement;
+    componentNativeElement = fixture.debugElement.nativeElement;
     nameInput = componentNativeElement.querySelector("form input[formControlName='name']");
     descriptionTextArea = componentNativeElement.querySelector("form textarea[formControlName='description']");
     submitButton = componentNativeElement.querySelector("form button[type='submit']");
@@ -92,5 +97,19 @@ describe('AddCategoryComponent', () => {
       name: "a",
       description: "b"
     });
+  });
+
+  it('Should not show the required error message at the start', () => {
+    const errorElement = componentNativeElement.querySelector("mat-error");
+    expect(errorElement).toBeNull();
+  });
+
+  it('Should show the required error message when name is dirty', () => {
+    componentUnderTest.form.controls.name.markAsTouched();
+    fixture.detectChanges();
+
+    const errorElement = componentNativeElement.querySelector("mat-error");
+    expect(errorElement).toBeTruthy();
+    expect(errorElement.textContent).toMatch(/required/i);
   });
 });
