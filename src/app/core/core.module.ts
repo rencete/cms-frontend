@@ -2,11 +2,11 @@ import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { FlexLayoutModule } from '@angular/flex-layout';
 
 import { environment } from "@environments/environment";
 import { API_URL_TOKEN } from "./services/api-url.token";
 import { BaseTemplateComponent } from './base-template/base-template.component';
-import { LayoutModule } from '@angular/cdk/layout';
 import { AngularMaterialModule } from '@core/angular-material/angular-material.module';
 
 @NgModule({
@@ -17,7 +17,7 @@ import { AngularMaterialModule } from '@core/angular-material/angular-material.m
     BrowserModule,
     BrowserAnimationsModule,
     HttpClientModule,
-    LayoutModule,
+    FlexLayoutModule,
     AngularMaterialModule
   ],
   providers: [
