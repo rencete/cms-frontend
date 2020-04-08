@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
+import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { environment } from "@environments/environment";
 import { API_URL_TOKEN } from "./services/api-url.token";
@@ -13,7 +14,8 @@ import { AngularMaterialModule } from '@core/angular-material/angular-material.m
     BaseTemplateComponent
   ],
   imports: [
-    CommonModule,
+    BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     LayoutModule,
     AngularMaterialModule
@@ -21,7 +23,7 @@ import { AngularMaterialModule } from '@core/angular-material/angular-material.m
   providers: [
     { provide: API_URL_TOKEN, useValue: environment.apiUrlParts }
   ],
-  exports: [
+  bootstrap: [
     BaseTemplateComponent
   ]
 })
