@@ -23,13 +23,13 @@ describe('ErrorDisplayModel', () => {
   });
 
   it("is not read at first", () => {
-    expect(new ErrorDisplayModel(new Error("test")).isRead()).toBe(false);
+    expect(new ErrorDisplayModel(new Error("test")).isRead).toBe(false);
   });
 
   it("can be marked as read", () => {
     const testModel = new ErrorDisplayModel(new Error("test"));
     testModel.markAsRead();
 
-    expect(testModel.isRead()).toBe(true);
+    expect(testModel.isRead).toBe(true);
   });
 });

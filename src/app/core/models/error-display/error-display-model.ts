@@ -11,7 +11,7 @@ export class ErrorDisplayModel {
         return this.error.toString();
     }
 
-    isRead(): boolean {
+    get isRead(): boolean {
         return this.read;
     }
 
