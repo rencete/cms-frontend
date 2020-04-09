@@ -1,11 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClient } from '@angular/common/http';
 import { of, Subject } from 'rxjs';
+import * as urljoin from "url-join";
 
 import { CategoryRepositoryService } from './category-repository.service';
 import { Category } from '@app/shared/models/category.interface';
-import { UrlParts } from '@app/shared/models/url-parts.interface';
-import { API_URL_TOKEN } from './api-url.token';
+import { RestApiUrlService } from '@core/services/rest-api-url/rest-api-url.service';
 
 describe('CategoryRepositoryService tests', () => {
   let initialCategoryValues: Category[] = [];
@@ -16,7 +16,7 @@ describe('CategoryRepositoryService tests', () => {
     put: jasmine.Spy,
     delete: jasmine.Spy
   };
-  let urlParts: UrlParts;
+  let apiUrlBase: string;
   let urlFullPath: string;
 
   beforeEach(() => {
@@ -36,13 +36,8 @@ describe('CategoryRepositoryService tests', () => {
   });
 
   beforeEach(() => {
-    urlParts = {
-      protocol: "http",
-      hostname: "sub.main.domain",
-      port: 1234,
-      pathname: "a"
-    }
-    urlFullPath = "http://sub.main.domain:1234/a/" + CategoryRepositoryService.CATEGORY_URL_BASE_PATH;
+    apiUrlBase = "http://sub.main.domain:1234/a";
+    urlFullPath = `${apiUrlBase}/${CategoryRepositoryService.CATEGORY_API_BASE_PATH}`;
   });
 
   describe("REST API success tests", () => {
@@ -52,10 +47,15 @@ describe('CategoryRepositoryService tests', () => {
         return of(initialCategoryValues);
       });
 
+      const mockApiUrlService = jasmine.createSpyObj('RestApiUrlService', ["createRestApiUrl"]);
+      mockApiUrlService.createRestApiUrl.and.callFake((base: string = "", path: string = "") => {
+        return urljoin(apiUrlBase, base, path);
+      });
+
       TestBed.configureTestingModule({
         providers: [
           { provide: HttpClient, useValue: httpClientSpy },
-          { provide: API_URL_TOKEN, useValue: urlParts }
+          { provide: RestApiUrlService, useValue: mockApiUrlService }
         ]
       });
       service = TestBed.inject(CategoryRepositoryService);
@@ -169,10 +169,15 @@ describe('CategoryRepositoryService tests', () => {
         return obs.asObservable();
       });
 
+      const mockApiUrlService = jasmine.createSpyObj('RestApiUrlService', ["createRestApiUrl"]);
+      mockApiUrlService.createRestApiUrl.and.callFake((base: string = "", path: string = "") => {
+        return urljoin(apiUrlBase, base, path);
+      });
+
       TestBed.configureTestingModule({
         providers: [
           { provide: HttpClient, useValue: httpClientSpy },
-          { provide: API_URL_TOKEN, useValue: urlParts }
+          { provide: RestApiUrlService, useValue: mockApiUrlService }
         ]
       });
       service = TestBed.inject(CategoryRepositoryService);

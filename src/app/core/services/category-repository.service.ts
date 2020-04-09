@@ -3,34 +3,34 @@ import { HttpClient } from "@angular/common/http";
 import { Observable, of, Subject, throwError } from 'rxjs';
 import { map, tap, catchError } from "rxjs/operators";
 
-import { API_URL_TOKEN } from "./api-url.token";
-import { UrlUtils } from "@shared/utils/url-utils";
-import { UrlParts } from '@app/shared/models/url-parts.interface';
+import { RestApiUrlService } from "@core/services/rest-api-url/rest-api-url.service";
 import { Category } from '@app/shared/models/category.interface';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CategoryRepositoryService {
-  public static readonly CATEGORY_URL_BASE_PATH = "category";
+  public static readonly CATEGORY_API_BASE_PATH = "category";
 
   private cachedCategories: Category[];
   private initialLoadCompleted: boolean = false;
   private initialLoadCompletedSubject: Subject<boolean> = new Subject<boolean>();
   private initialLoadCompleted$ = this.initialLoadCompletedSubject.asObservable();
-  private restApiUrl: string;
 
-  constructor(@Inject(API_URL_TOKEN) public urlParts: UrlParts, public http: HttpClient) {
-    this.restApiUrl = UrlUtils.generateRestApiUrl(urlParts, CategoryRepositoryService.CATEGORY_URL_BASE_PATH);
+  constructor(private restApiUrlService: RestApiUrlService, public http: HttpClient) {
     this.loadInitialCategoryData();
   }
 
   private loadInitialCategoryData() {
-    this.http.get<Category[]>(this.restApiUrl).subscribe((data) => {
+    this.http.get<Category[]>(this.createApiPath()).subscribe((data) => {
       this.cachedCategories = data;
       this.setInitialLoadCompleted();
     });
   }
+
+  private createApiPath(...paths: string[]): string {
+    return this.restApiUrlService.createRestApiUrl(CategoryRepositoryService.CATEGORY_API_BASE_PATH, ...paths);
+  };
 
   private setInitialLoadCompleted() {
     this.initialLoadCompleted = true;
@@ -83,7 +83,7 @@ export class CategoryRepositoryService {
   }
 
   private postCategoryAndUpdateCache(category: Category): Observable<Category> {
-    let obs = this.http.post<Category>(this.restApiUrl, category);
+    let obs = this.http.post<Category>(this.createApiPath(), category);
     obs = obs.pipe(
       tap(() => {
         this.addOrUpdateCache(category);
@@ -95,7 +95,7 @@ export class CategoryRepositoryService {
   }
 
   private putCategoryAndUpdateCache(category: Category): Observable<Category> {
-    let putApiUrl = UrlUtils.appendPathToUrl(this.restApiUrl, category.id);
+    let putApiUrl = this.createApiPath(category.id);
     let obs = this.http.put<Category>(putApiUrl, category)
     obs = obs.pipe(
       tap(() => {
@@ -118,7 +118,7 @@ export class CategoryRepositoryService {
   }
 
   private deleteCategoryAndUpdateCache(categoryId: string): Observable<Category> {
-    const deleteApiUrl = UrlUtils.appendPathToUrl(this.restApiUrl, categoryId);
+    const deleteApiUrl = this.createApiPath(categoryId);
     let obs = this.http.delete<Category>(deleteApiUrl);
     obs = obs.pipe(
       tap(() => {
