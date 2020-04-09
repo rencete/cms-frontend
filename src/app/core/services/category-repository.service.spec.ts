@@ -42,7 +42,7 @@ describe('CategoryRepositoryService tests', () => {
       port: 1234,
       pathname: "a"
     }
-    urlFullPath = "http://sub.main.domain:1234/a/category"
+    urlFullPath = "http://sub.main.domain:1234/a/" + CategoryRepositoryService.CATEGORY_URL_BASE_PATH;
   });
 
   describe("REST API success tests", () => {

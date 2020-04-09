@@ -12,22 +12,17 @@ import { Category } from '@app/shared/models/category.interface';
   providedIn: 'root'
 })
 export class CategoryRepositoryService {
+  public static readonly CATEGORY_URL_BASE_PATH = "category";
+
   private cachedCategories: Category[];
   private initialLoadCompleted: boolean = false;
   private initialLoadCompletedSubject: Subject<boolean> = new Subject<boolean>();
   private initialLoadCompleted$ = this.initialLoadCompletedSubject.asObservable();
   private restApiUrl: string;
 
-  private CATEGORY_URL_BASE_PATH = "category";
-
   constructor(@Inject(API_URL_TOKEN) public urlParts: UrlParts, public http: HttpClient) {
-    this.setRestApiUrl();
+    this.restApiUrl = UrlUtils.generateRestApiUrl(urlParts, CategoryRepositoryService.CATEGORY_URL_BASE_PATH);
     this.loadInitialCategoryData();
-  }
-
-  private setRestApiUrl() {
-    const urlBase: string = UrlUtils.createUrlFromParts(this.urlParts);
-    this.restApiUrl = UrlUtils.appendPathToUrl(urlBase, this.CATEGORY_URL_BASE_PATH);
   }
 
   private loadInitialCategoryData() {

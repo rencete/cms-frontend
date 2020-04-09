@@ -13,4 +13,9 @@ export class UrlUtils {
   static appendPathToUrl(...paths: string[]): string {
     return urljoin.apply(undefined, paths);
   }
+
+  static generateRestApiUrl(urlParts: UrlParts, apiBasePath: string): string {
+    const urlBase: string = UrlUtils.createUrlFromParts(urlParts);
+    return UrlUtils.appendPathToUrl(urlBase, apiBasePath);
+  }
 }
