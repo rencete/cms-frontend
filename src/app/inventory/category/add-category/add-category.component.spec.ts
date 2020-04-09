@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { of } from 'rxjs';
 
 import { AddCategoryComponent } from './add-category.component';
 import { CategoryRepositoryService } from '@app/core/services/category-repository.service';
@@ -18,6 +19,9 @@ describe('AddCategoryComponent', () => {
 
   beforeEach(async(() => {
     let mock = jasmine.createSpyObj("CategoryRepositoryService", ["addCategory"]);
+    mock.addCategory.and.callFake((category) => {
+      return of(category);
+    });
 
     TestBed.configureTestingModule({
       declarations: [
