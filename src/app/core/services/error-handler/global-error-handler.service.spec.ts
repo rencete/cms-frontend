@@ -11,7 +11,7 @@ describe('GlobalErrorHandlerService', () => {
   });
 
   beforeEach(() => {
-    spyOn(console, "log");
+    spyOn(console, "error");
   });
 
   it('should be created', () => {
@@ -22,7 +22,6 @@ describe('GlobalErrorHandlerService', () => {
     const testError = new Error("test");
     service.handleError(testError);
 
-    expect(console.log).toHaveBeenCalled();
-    expect(console.log).toHaveBeenCalledWith(testError);
+    expect(console.error).toHaveBeenCalled();
   });
 });
