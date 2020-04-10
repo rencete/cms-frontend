@@ -86,11 +86,11 @@ describe('RemoteLoggingService', () => {
       );
     });
 
-    it("Should retry 3 additional times for errors", () => {
+    it("Should retry additional times for errors", () => {
       const testObj: any = { msg: "test" };
       service.remoteLog(testObj).subscribe(
         () => { fail() },
-        (err) => { expect(spyFunc).toHaveBeenCalledTimes(1 + 3) }
+        (err) => { expect(spyFunc).toHaveBeenCalledTimes(1 + RemoteLoggingService.NUMBER_OF_TIMES_TO_RETRY) }
       );
     });
   });
