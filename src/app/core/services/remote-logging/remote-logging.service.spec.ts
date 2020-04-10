@@ -60,7 +60,6 @@ describe('RemoteLoggingService', () => {
     });
     service = TestBed.inject(RemoteLoggingService);
     httpClientMock = TestBed.inject(HttpClient);
-    return { service, httpClientMock };
   }
 
   describe('Error tests', () => {
