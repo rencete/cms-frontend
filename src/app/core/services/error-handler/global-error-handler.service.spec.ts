@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { GlobalErrorHandlerService } from './global-error-handler.service';
 import { ErrorDisplayService } from "@core/services/error-display/error-display.service";
 import { RemoteLoggingService } from "@core/services/remote-logging/remote-logging.service";
-import { Observable, of } from 'rxjs';
+import { Observable, of, throwError, TimeoutError } from 'rxjs';
 
 describe('GlobalErrorHandlerService', () => {
   let service: GlobalErrorHandlerService;
@@ -11,27 +11,52 @@ describe('GlobalErrorHandlerService', () => {
   let mockErrorDisplayService: ErrorDisplayService;
   let mockRemoteLoggingService: RemoteLoggingService;
 
-  beforeEach(() => {
-    testError = new Error("test");
-    const displayService = createMockDisplayService();
-    const loggingService = createMockRemoteLoggingService(of(testError));
-    prepareTestBed(displayService, loggingService);
+  describe("Success tests", () => {
+    beforeEach(() => {
+      testError = new Error("test");
+      const displayService = createMockDisplayService();
+      const loggingService = createMockRemoteLoggingService(of(testError));
+      prepareTestBed(displayService, loggingService);
+    });
+  
+    beforeEach(() => {
+      spyOn(console, "error");
+      mockErrorDisplayService = TestBed.inject<ErrorDisplayService>(ErrorDisplayService);
+      mockRemoteLoggingService = TestBed.inject<RemoteLoggingService>(RemoteLoggingService);
+    });
+  
+    it('should be created', () => {
+      expect(service).toBeTruthy();
+    });
+  
+    it('should log the error to console', () => {
+      service.handleError(testError);
+  
+      expect(console.error).toHaveBeenCalledTimes(1);
+    });
+  
+    it('should send the error to service for displaying', () => {
+      service.handleError(testError);
+  
+      expect(mockErrorDisplayService.addErrorToDisplay).toHaveBeenCalledTimes(1);
+    });
+  
+    it('should send the error to remote logging', () => {
+      service.handleError(testError);
+  
+      expect(mockRemoteLoggingService.remoteLog).toHaveBeenCalledTimes(1);
+    });
+
   });
 
   function createMockDisplayService(): { addErrorToDisplay: jasmine.Spy } {
     let mockDisplayService = jasmine.createSpyObj("ErrorDisplayService", ["addErrorToDisplay"]);
-    mockDisplayService.addErrorToDisplay.and.callFake((err) => {
-      expect(err).toEqual(testError);
-    });
     return mockDisplayService;
   }
 
   function createMockRemoteLoggingService(returnObs: Observable<Error>): { remoteLog: jasmine.Spy } {
     let mockLoggingService = jasmine.createSpyObj("RemoteLoggingService", ["remoteLog"]);
-    mockLoggingService.remoteLog.and.callFake((err) => {
-      expect(err).toEqual(testError);
-      return returnObs;
-    });
+    mockLoggingService.remoteLog.and.callFake(() => { return returnObs });
     return mockLoggingService;
   }
 
@@ -48,31 +73,37 @@ describe('GlobalErrorHandlerService', () => {
     service = TestBed.inject(GlobalErrorHandlerService);
   }
 
-  beforeEach(() => {
-    spyOn(console, "error");
-    mockErrorDisplayService = TestBed.inject<ErrorDisplayService>(ErrorDisplayService);
-    mockRemoteLoggingService = TestBed.inject<RemoteLoggingService>(RemoteLoggingService);
-  });
+  describe("Error tests", () => {
+    let loggingError: Error;
 
-  it('should be created', () => {
-    expect(service).toBeTruthy();
-  });
+    beforeEach(() => {
+      testError = new Error("test");
+      loggingError = new TimeoutError();
+      const displayService = createMockDisplayService();
+      const loggingService = createMockRemoteLoggingService(throwError(loggingError));
+      prepareTestBed(displayService, loggingService);
+    });
+  
+    beforeEach(() => {
+      spyOn(console, "error");
+      mockErrorDisplayService = TestBed.inject<ErrorDisplayService>(ErrorDisplayService);
+      mockRemoteLoggingService = TestBed.inject<RemoteLoggingService>(RemoteLoggingService);
+    });
 
-  it('should log the error to console', () => {
-    service.handleError(testError);
+    it("should log the remote logging error to console", () => {
+      service.handleError(testError);  
 
-    expect(console.error).toHaveBeenCalled();
-  });
-
-  it('should send the error to service for displaying', () => {
-    service.handleError(testError);
-
-    expect(mockErrorDisplayService.addErrorToDisplay).toHaveBeenCalled();
-  });
-
-  it('should send the error to remote logging', () => {
-    service.handleError(testError);
-
-    expect(mockRemoteLoggingService.remoteLog).toHaveBeenCalled();
+      expect(console.error).toHaveBeenCalledTimes(2);
+      expect(console.error).toHaveBeenCalledWith(testError);
+      expect(console.error).toHaveBeenCalledWith(loggingError);
+    });
+  
+    it('should send the remote logging error to display service', () => {
+      service.handleError(testError);
+  
+      expect(mockErrorDisplayService.addErrorToDisplay).toHaveBeenCalledTimes(2);
+      expect(mockErrorDisplayService.addErrorToDisplay).toHaveBeenCalledWith(testError);
+      expect(mockErrorDisplayService.addErrorToDisplay).toHaveBeenCalledWith(loggingError);
+    });
   });
 });
