@@ -5,7 +5,7 @@ import { CategoryRepositoryService } from '@app/core/services/category-repositor
 import { Category } from '@app/shared/models/category.interface';
 
 @Component({
-  selector: 'app-add-category',
+  selector: 'category-add',
   templateUrl: './add-category.component.html',
   styleUrls: ['./add-category.component.css']
 })

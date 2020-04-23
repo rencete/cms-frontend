@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-base-template',
+  selector: 'cms-base-template',
   templateUrl: './base-template.component.html',
   styleUrls: ['./base-template.component.css']
 })
