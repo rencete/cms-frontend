@@ -27,7 +27,7 @@ import { ErrorDisplayComponent } from './components/error-display/error-display.
     { provide: API_URL_TOKEN, useValue: environment.apiUrlParts },
     { provide: ErrorHandler, useClass: GlobalErrorHandlerService }
   ],
-  bootstrap: [
+  exports: [
     BaseTemplateComponent
   ]
 })
