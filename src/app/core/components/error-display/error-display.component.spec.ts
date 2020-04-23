@@ -3,7 +3,7 @@ import { Subject, Observable } from 'rxjs';
 
 import { ErrorDisplayComponent } from './error-display.component';
 import { ErrorDisplayService } from '@app/core/services/error-display/error-display.service';
-import { ErrorDisplayModel } from '@app/error/models/error-display-model';
+import { ErrorDisplayModel } from '@app/error/models/error.model';
 import { AngularMaterialModule } from '@app/core/angular-material/angular-material.module';
 
 describe('ErrorDisplayComponent', () => {
