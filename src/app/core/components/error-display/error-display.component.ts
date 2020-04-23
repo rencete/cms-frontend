@@ -2,7 +2,7 @@ import { Component, OnDestroy, AfterViewInit, OnInit } from '@angular/core';
 import { Subscription, Observable, of, Subject } from 'rxjs';
 
 import { ErrorDisplayService } from "@core/services/error-display/error-display.service";
-import { ErrorDisplayModel } from '@app/core/models/error-display/error-display-model';
+import { ErrorDisplayModel } from '@app/error/models/error-display-model';
 import { startWith, map } from 'rxjs/operators';
 
 @Component({
