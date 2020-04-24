@@ -1,14 +1,23 @@
-export class ErrorDisplayModel {
-    private read: boolean;
-    private error: Error;
+import { nanoid } from "nanoid";
 
-    constructor(err: Error) {
+export class ErrorModel {
+    id: string;
+    name: string;
+    message: string;
+    
+    private read: boolean;
+    private source: any;
+
+    constructor(err: ErrorModelInterface) {
+        this.id = nanoid();
+        this.name = err.name;
+        this.message = err.message
         this.read = false;
-        this.error = err;
+        this.source = err;
     }
 
     toString(): string {
-        return this.error.toString();
+        return this.source.toString();
     }
 
     get isRead(): boolean {
@@ -18,4 +27,9 @@ export class ErrorDisplayModel {
     markAsRead(): void {
         this.read = true;
     }
+}
+
+interface ErrorModelInterface {
+    name: string;
+    message: string
 }

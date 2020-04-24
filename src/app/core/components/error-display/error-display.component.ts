@@ -2,7 +2,7 @@ import { Component, OnDestroy, AfterViewInit, OnInit } from '@angular/core';
 import { Subscription, Observable, of, Subject } from 'rxjs';
 
 import { ErrorDisplayService } from "@core/services/error-display/error-display.service";
-import { ErrorDisplayModel } from '@app/error/models/error.model';
+import { ErrorModel } from '@app/error/models/error.model';
 import { startWith, map } from 'rxjs/operators';
 
 @Component({
@@ -12,7 +12,7 @@ import { startWith, map } from 'rxjs/operators';
 })
 export class ErrorDisplayComponent implements OnInit, AfterViewInit, OnDestroy {
   private subscription: Subscription;
-  public errors$: Observable<ErrorDisplayModel[]>;
+  public errors$: Observable<ErrorModel[]>;
 
   constructor(private errorService: ErrorDisplayService) {
   }
@@ -38,7 +38,7 @@ export class ErrorDisplayComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  markErrorAsRead(err: ErrorDisplayModel) {
+  markErrorAsRead(err: ErrorModel) {
     err.markAsRead();
   }
 }

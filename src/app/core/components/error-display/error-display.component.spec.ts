@@ -3,7 +3,7 @@ import { Subject, Observable } from 'rxjs';
 
 import { ErrorDisplayComponent } from './error-display.component';
 import { ErrorDisplayService } from '@app/core/services/error-display/error-display.service';
-import { ErrorDisplayModel } from '@app/error/models/error.model';
+import { ErrorModel } from '@app/error/models/error.model';
 import { AngularMaterialModule } from '@app/core/angular-material/angular-material.module';
 
 describe('ErrorDisplayComponent', () => {
@@ -11,20 +11,20 @@ describe('ErrorDisplayComponent', () => {
   let fixture: ComponentFixture<ErrorDisplayComponent>;
   let mockErrorDisplayService: {
     getUnreadErrors : jasmine.Spy;
-    subj : Subject<ErrorDisplayModel>;
-    newErrorAdded$ : Observable<ErrorDisplayModel>;
+    subj : Subject<ErrorModel>;
+    newErrorAdded$ : Observable<ErrorModel>;
   };
   let componentNativeElement: HTMLElement;
 
   beforeEach(async(() => {
     mockErrorDisplayService = jasmine.createSpyObj("ErrorDisplayService", ["getUnreadErrors"]);
-    mockErrorDisplayService.subj = new Subject<ErrorDisplayModel>();
+    mockErrorDisplayService.subj = new Subject<ErrorModel>();
     mockErrorDisplayService.newErrorAdded$ = mockErrorDisplayService.subj.asObservable();
     mockErrorDisplayService.getUnreadErrors.and.callFake(() => {
       return [
-        new ErrorDisplayModel(new TypeError("Error 1")),
-        new ErrorDisplayModel(new SyntaxError("Error 2")),
-        new ErrorDisplayModel(new URIError("Error 3"))
+        new ErrorModel(new TypeError("Error 1")),
+        new ErrorModel(new SyntaxError("Error 2")),
+        new ErrorModel(new URIError("Error 3"))
       ]
     });
 
@@ -62,13 +62,13 @@ describe('ErrorDisplayComponent', () => {
     const errorToAdd = new Error("New error");
     mockErrorDisplayService.getUnreadErrors.and.callFake(() => {
       return [
-        new ErrorDisplayModel(new TypeError("Error 1")),
-        new ErrorDisplayModel(new SyntaxError("Error 2")),
-        new ErrorDisplayModel(new URIError("Error 3")),
-        new ErrorDisplayModel(errorToAdd)
+        new ErrorModel(new TypeError("Error 1")),
+        new ErrorModel(new SyntaxError("Error 2")),
+        new ErrorModel(new URIError("Error 3")),
+        new ErrorModel(errorToAdd)
       ]
     });
-    mockErrorDisplayService.subj.next(new ErrorDisplayModel(errorToAdd));
+    mockErrorDisplayService.subj.next(new ErrorModel(errorToAdd));
     fixture.detectChanges();
 
     const cards = componentNativeElement.querySelectorAll(".errors-container__card");
@@ -79,8 +79,8 @@ describe('ErrorDisplayComponent', () => {
     const buttons = componentNativeElement.querySelectorAll(".errors-container__card button");
     mockErrorDisplayService.getUnreadErrors.and.callFake(() => {
       return [
-        new ErrorDisplayModel(new TypeError("Error 1")),
-        new ErrorDisplayModel(new URIError("Error 3"))
+        new ErrorModel(new TypeError("Error 1")),
+        new ErrorModel(new URIError("Error 3"))
       ]
     });
     (<HTMLButtonElement> buttons[1]).click();
