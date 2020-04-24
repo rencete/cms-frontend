@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { GlobalErrorHandlerService } from './global-error-handler.service';
-import { ErrorDisplayService } from "@core/services/error-display/error-display.service";
+import { ErrorDisplayService } from "@app/error/services/error-store.service";
 import { RemoteLoggingService } from "@core/services/remote-logging/remote-logging.service";
 import { Observable, of, throwError, TimeoutError } from 'rxjs';
 

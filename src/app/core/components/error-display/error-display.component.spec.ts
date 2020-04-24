@@ -2,7 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { Subject, Observable } from 'rxjs';
 
 import { ErrorDisplayComponent } from './error-display.component';
-import { ErrorDisplayService } from '@app/core/services/error-display/error-display.service';
+import { ErrorDisplayService } from '@app/error/services/error-store.service';
 import { ErrorModel } from '@app/error/models/error.model';
 import { AngularMaterialModule } from '@app/core/angular-material/angular-material.module';
 

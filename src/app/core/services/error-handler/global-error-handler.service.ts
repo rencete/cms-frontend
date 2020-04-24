@@ -1,6 +1,6 @@
 import { Injectable, ErrorHandler, Injector } from '@angular/core';
 
-import { ErrorDisplayService } from '@core/services/error-display/error-display.service';
+import { ErrorDisplayService } from '@app/error/services/error-store.service';
 import { RemoteLoggingService } from "@core/services/remote-logging/remote-logging.service";
 
 @Injectable({
