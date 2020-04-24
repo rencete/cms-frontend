@@ -5,7 +5,7 @@ import { ErrorStoreService } from "@app/error/services/error-store.service";
 import { RemoteLoggingService } from "@core/services/remote-logging/remote-logging.service";
 import { Observable, of, throwError, TimeoutError } from 'rxjs';
 
-xdescribe('GlobalErrorHandlerService', () => {
+describe('GlobalErrorHandlerService', () => {
   let service: GlobalErrorHandlerService;
   let testError: Error;
   let mockErrorDisplayService: ErrorStoreService;
@@ -49,8 +49,8 @@ xdescribe('GlobalErrorHandlerService', () => {
 
   });
 
-  function createMockDisplayService(): { addErrorToDisplay: jasmine.Spy } {
-    let mockDisplayService = jasmine.createSpyObj("ErrorDisplayService", ["addErrorToDisplay"]);
+  function createMockDisplayService(): { addError: jasmine.Spy } {
+    let mockDisplayService = jasmine.createSpyObj("ErrorStoreService", ["addError"]);
     return mockDisplayService;
   }
 
@@ -61,7 +61,7 @@ xdescribe('GlobalErrorHandlerService', () => {
   }
 
   function prepareTestBed(
-    mockDisplayService: { addErrorToDisplay: jasmine.Spy<InferableFunction>; },
+    mockDisplayService: { addError: jasmine.Spy<InferableFunction>; },
     mockLoggingService: { remoteLog: jasmine.Spy<InferableFunction>; }
   ) {
     TestBed.configureTestingModule({

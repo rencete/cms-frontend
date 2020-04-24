@@ -2,6 +2,7 @@ import { Injectable, ErrorHandler, Injector } from '@angular/core';
 
 import { ErrorStoreService } from '@app/error/services/error-store.service';
 import { RemoteLoggingService } from "@core/services/remote-logging/remote-logging.service";
+import { ErrorModelInterface } from '@app/error/models/error-model.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -25,8 +26,8 @@ export class GlobalErrorHandlerService implements ErrorHandler {
       });
   }
 
-  private sendErrorToDisplayService(error: any) {
-    const errorDisplayService = this.injector.get(ErrorStoreService);
-    errorDisplayService.addError(error);
+  private sendErrorToDisplayService(error: ErrorModelInterface) {
+    const errorStore = this.injector.get(ErrorStoreService);
+    errorStore.addError(error);
   }
 }
