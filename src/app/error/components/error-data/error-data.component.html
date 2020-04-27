@@ -1,0 +1,14 @@
+<mat-card>
+  <mat-card-header>
+    <mat-icon mat-card-avatar>error</mat-icon>
+    <mat-card-title class="error-name">{{ error.name }}</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <p class="error-message">
+      {{ error.message }}
+    </p>
+  </mat-card-content>
+  <mat-card-actions align='end'>
+    <button mat-button (click)="dismissError()">DISMISS</button>
+  </mat-card-actions>
+</mat-card>
