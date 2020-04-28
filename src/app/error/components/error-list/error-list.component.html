@@ -1,0 +1,5 @@
+<div class="errors-container">
+    <error-data *ngFor="let error of errors"
+        [error]="error" (dismiss)="dismissError($event)">
+    </error-data>
+</div>
