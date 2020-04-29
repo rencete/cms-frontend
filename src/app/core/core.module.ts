@@ -1,7 +1,6 @@
 import { NgModule, ErrorHandler } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
-import { BrowserModule } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FlexLayoutModule } from '@angular/flex-layout';
 
 import { environment } from "@environments/environment";
@@ -17,8 +16,7 @@ import { ErrorDisplayComponent } from './components/error-display/error-display.
     ErrorDisplayComponent
   ],
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
+    CommonModule,
     HttpClientModule,
     FlexLayoutModule,
     AngularMaterialModule
