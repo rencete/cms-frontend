@@ -1,6 +1,7 @@
 import { NgModule, ErrorHandler } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { RouterModule } from '@angular/router';
 
 import { environment } from "@environments/environment";
 import { API_URL_TOKEN } from "./services/api-url.token";
@@ -14,6 +15,7 @@ import { SharedModule } from '@app/shared/shared.module';
     BaseTemplateComponent
   ],
   imports: [
+    RouterModule,
     HttpClientModule,
     FlexLayoutModule,
     AngularMaterialModule,

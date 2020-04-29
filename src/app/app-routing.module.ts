@@ -5,6 +5,12 @@ import { BaseTemplateComponent } from './core/base-template/base-template.compon
 
 
 const routes: Routes = [
+  { path: 'error',
+    component: BaseTemplateComponent,
+    children: [
+      { path: '', loadChildren: () => import('./error/error.module').then(mod => mod.ErrorModule)}
+    ]
+  },
   { path: '', component: BaseTemplateComponent },
   { path: '', redirectTo: '/', pathMatch: 'full' }
 ];
