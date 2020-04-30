@@ -1,0 +1,10 @@
+<ng-container *ngIf="message$ | async as message">
+    <div *ngIf="message.show">
+        <div>
+            <mat-icon *ngIf="message.icon">{{message.icon}}</mat-icon>
+            <p>{{message.text}}</p>
+            <button *ngIf="message.dismissBtnTxt" (click)="dismissAction()">{{message.dismissBtnTxt}}</button>
+            <button *ngIf="message.confirmBtnTxt" (click)="confirmAction()">{{message.confirmBtnTxt}}</button>
+        </div>
+    </div>
+</ng-container>

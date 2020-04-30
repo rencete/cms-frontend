@@ -9,10 +9,12 @@ import { BaseTemplateComponent } from './base-template/base-template.component';
 import { AngularMaterialModule } from './angular-material/angular-material.module';
 import { GlobalErrorHandlerService } from './services/error-handler/global-error-handler.service';
 import { SharedModule } from '@app/shared/shared.module';
+import { BannerComponent } from './components/banner/banner.component';
 
 @NgModule({
   declarations: [
-    BaseTemplateComponent
+    BaseTemplateComponent,
+    BannerComponent
   ],
   imports: [
     RouterModule,
