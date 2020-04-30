@@ -1,11 +1,12 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 
 import { ErrorData } from '@app/error/models/error-data.model';
 
 @Component({
   selector: 'error-data',
   templateUrl: './error-data.component.html',
-  styleUrls: ['./error-data.component.css']
+  styleUrls: ['./error-data.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ErrorDataComponent {
   @Input() error: ErrorData;
