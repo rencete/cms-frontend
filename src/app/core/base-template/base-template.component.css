@@ -5,3 +5,7 @@
 .sidenav {
   width: 200px;
 }
+
+mat-toolbar {
+  z-index: 2;
+}
