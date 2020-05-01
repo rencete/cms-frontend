@@ -11,6 +11,8 @@ import { BannerData } from '@app/core/models/banner-data.model';
 export class BannerService {
   public message$: Observable<BannerData>;
 
+  private readonly DISMISS_TO_NEXT_DATA_DELAY = 550;
+
   private currentMsg: BehaviorSubject<BannerMessage>;
   private queuedMsgs: Array<BannerMessage>;
 
@@ -77,7 +79,7 @@ export class BannerService {
       }
       setTimeout(() => {
         this.sendNextMessage();
-      });
+      }, this.DISMISS_TO_NEXT_DATA_DELAY);
     }
   }
 

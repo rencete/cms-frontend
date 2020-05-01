@@ -1,4 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { Subject } from 'rxjs';
 
 import { BannerComponent } from './banner.component';
@@ -24,6 +25,9 @@ describe('BannerComponent', () => {
     mockService.message$ = new Subject<BannerData>();
 
     TestBed.configureTestingModule({
+      imports: [
+        NoopAnimationsModule
+      ],
       declarations: [
         BannerComponent
       ],

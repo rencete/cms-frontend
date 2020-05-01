@@ -1,5 +1,5 @@
 <ng-container *ngIf="message$ | async as message">
-    <div *ngIf="message.show">
+    <div *ngIf="message.show" @slideInOut class="banner">
         <div>
             <mat-icon *ngIf="message.icon">{{message.icon}}</mat-icon>
             <p>{{message.text}}</p>
