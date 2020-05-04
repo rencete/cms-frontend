@@ -1,5 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { MatIconModule } from '@angular/material/icon';
 import { Subject } from 'rxjs';
 
 import { BannerComponent } from './banner.component';
@@ -26,7 +27,8 @@ describe('BannerComponent', () => {
 
     TestBed.configureTestingModule({
       imports: [
-        NoopAnimationsModule
+        NoopAnimationsModule,
+        MatIconModule
       ],
       declarations: [
         BannerComponent

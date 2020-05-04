@@ -1,4 +1,5 @@
 import { LayoutModule } from '@angular/cdk/layout';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MatButtonModule } from '@angular/material/button';
@@ -16,6 +17,7 @@ describe('BaseTemplateComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
       declarations: [BaseTemplateComponent],
       imports: [
         RouterTestingModule,
