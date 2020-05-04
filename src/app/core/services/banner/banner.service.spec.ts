@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 
 import { BannerService } from './banner.service';
 import { BannerData } from '@app/core/models/banner-data.model';
@@ -11,6 +11,7 @@ describe('BannerService', () => {
   let dismissText: string;
   let confirmCb: jasmine.Spy;
   let dismissCb: jasmine.Spy;
+  let delayBetMsgs: number;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
@@ -24,36 +25,34 @@ describe('BannerService', () => {
     dismissText = "Dismiss button";
     confirmCb = jasmine.createSpy();
     dismissCb = jasmine.createSpy();
+    delayBetMsgs = service.DISMISS_TO_NEXT_DATA_DELAY;
   });
 
-  it('should have display = false for initial message value', (done) => {
-    service.message$.subscribe(
-      (msg) => {
-        expect(msg.show).toBe(false);
-        done();
-      },
-      (err) => {
-        fail("Should not fail, err = " + err);
-      }
-    )
-  });
+  it('should have display = false for initial message value', fakeAsync(() => {
+    checkObservableValue(false);
+  }));
 
-  it('should show the message when adding new message', (done) => {
-    let countMsgs = 0;
-    service.message$.subscribe(
+  function checkObservableValue(isShow: boolean): void {
+    let checked = false;
+    const subs = service.message$.subscribe(
       (msg) => {
-        countMsgs++;
-        if (countMsgs === 2) {
+        if (isShow) {
           checkMsgContent(msg);
-          done();
+        } else {
+          expect(msg.show).toBe(false);
         }
+        checked = true;
       },
       (err) => {
         fail("Should not fail, err = " + err);
       }
-    )
-    service.addMessage(msgText, iconText, confirmText, confirmCb, dismissText, dismissCb);
-  });
+    );
+    subs.unsubscribe();
+
+    if(!checked) {
+      fail("did not check the observed value.");
+    }
+  }
 
   function checkMsgContent(msg: BannerData) {
     expect(msg.show).toBe(true);
@@ -63,74 +62,42 @@ describe('BannerService', () => {
     expect(msg.dismissBtnTxt).toBe(dismissText);
   }
 
-  it('should dismiss the message when dismissing message', (done) => {
-    let countMsgs = 0;
-    service.message$.subscribe(
-      (msg) => {
-        countMsgs++;
-        if (countMsgs === 3) {
-          expect(msg.show).toBe(false);
-          done();
-        }
-      },
-      (err) => {
-        fail("Should not fail, err = " + err);
-      }
-    )
+  it('should show the message when adding new message', fakeAsync(() => {
     service.addMessage(msgText, iconText, confirmText, confirmCb, dismissText, dismissCb);
-    service.dismissMessage();
-  });
+    checkObservableValue(true);
+  }));
 
-  it('should call dismiss callback function when dismissing message', (done) => {
-    dismissCb.and.callFake(() => {
-      expect(dismissCb).toHaveBeenCalledTimes(1);
-      done();
-    });
-    service.message$.subscribe(
-      (msg) => {
-      },
-      (err) => {
-        fail("Should not fail, err = " + err);
-      }
-    )
+  it('should dismiss the message when dismissing message', fakeAsync(() => {
     service.addMessage(msgText, iconText, confirmText, confirmCb, dismissText, dismissCb);
+    tick();
     service.dismissMessage();
-  });
+    checkObservableValue(false);
+    tick();
+  }));
 
-  it('should call confirm callback function when confirming message', (done) => {
-    confirmCb.and.callFake(() => {
-      expect(confirmCb).toHaveBeenCalledTimes(1);
-      done();
-    });
-    service.message$.subscribe(
-      (msg) => {
-      },
-      (err) => {
-        fail("Should not fail, err = " + err);
-      }
-    )
+  it('should call dismiss callback function when dismissing message', fakeAsync(() => {
+    service.addMessage(msgText, iconText, confirmText, confirmCb, dismissText, dismissCb);
+    tick();
+    service.dismissMessage();
+    expect(dismissCb).toHaveBeenCalledTimes(1);
+    tick();
+  }));
+
+  it('should call confirm callback function when confirming message', fakeAsync(() => {
     service.addMessage(msgText, iconText, confirmText, confirmCb, dismissText, dismissCb);
     service.confirmMessage();
-  });
+    expect(confirmCb).toHaveBeenCalledTimes(1);
+  }));
 
-  it('should send next message after dismiss', (done) => {
-    let countMsgs = 0;
-    service.message$.subscribe(
-      (msg) => {
-        countMsgs++;
-        if (countMsgs === 4) {
-          checkMsgContent(msg);
-          done();
-        }
-      },
-      (err) => {
-        fail("Should not fail, err = " + err);
-      }
-    )
+  it('should send next message after dismiss', fakeAsync(() => {
     service.addMessage("msg1", "msg1", "msg1", () => {});
     service.addMessage(msgText, iconText, confirmText, confirmCb, dismissText, dismissCb);
+    tick();
     service.dismissMessage();
-  });
+    checkObservableValue(false);
+    tick();
+    checkObservableValue(true);
+  }));
 
   it('should return false for hasMessage if it does not have a message with that ID', () => {
     const msgId = service.addMessage(msgText, iconText, confirmText, confirmCb, dismissText, dismissCb);
@@ -148,61 +115,59 @@ describe('BannerService', () => {
     expect(service.hasMessage(msgId)).toBe(true);
   });
 
-  it('should dismiss the message when cancelling active message', (done) => {
-    let countMsgs = 0;
-    service.message$.subscribe(
-      (msg) => {
-        countMsgs++;
-        if (countMsgs === 3) {
-          expect(msg.show).toBe(false);
-          done();
-        }
-      },
-      (err) => {
-        fail("Should not fail, err = " + err);
-      }
-    )
+  it('should dismiss the message when cancelling active message', fakeAsync(() => {
     const msgId = service.addMessage(msgText, iconText, confirmText, confirmCb, dismissText, dismissCb);
+    tick();
     service.cancelMessage(msgId);
-  });
+    checkObservableValue(false);
+    tick();
+  }));
 
-  it('should send next message after cancelling active message', (done) => {
-    let countMsgs = 0;
-    service.message$.subscribe(
-      (msg) => {
-        countMsgs++;
-        if (countMsgs === 4) {
-          checkMsgContent(msg);
-          done();
-        }
-      },
-      (err) => {
-        fail("Should not fail, err = " + err);
-      }
-    )
+  it('should send next message after cancelling active message', fakeAsync(() => {
     const msgId = service.addMessage("msg1", "msg1", "msg1", () => {});
     service.addMessage(msgText, iconText, confirmText, confirmCb, dismissText, dismissCb);
+    tick();
     service.cancelMessage(msgId);
-  });
+    checkObservableValue(false);
+    tick();
+    checkObservableValue(true);
+  }));
 
-  it('should cancel an item in the queue', (done) => {
-    let countMsgs = 0;
-    service.message$.subscribe(
-      (msg) => {
-        countMsgs++;
-        if (countMsgs === 4) {
-          checkMsgContent(msg);
-          done();
-        }
-      },
-      (err) => {
-        fail("Should not fail, err = " + err);
-      }
-    )
+  it('should cancel an item in the queue', fakeAsync(() => {
     service.addMessage("msg1", "msg1", "msg1", () => {});
     const msgId = service.addMessage("msg2", "msg2", "msg2", () => {});
     service.addMessage(msgText, iconText, confirmText, confirmCb, dismissText, dismissCb);
+    tick();
     service.cancelMessage(msgId);
     service.dismissMessage();
-  });
+    tick();
+    checkObservableValue(true);
+  }));
+
+  it('should send next message with delay after dismiss', fakeAsync(() => {
+    tick(delayBetMsgs);
+    service.addMessage("msg1", "msg1", "msg1", () => {});
+    service.addMessage(msgText, iconText, confirmText, confirmCb, dismissText, dismissCb);
+    tick();
+
+    service.dismissMessage();
+    let count = 0;
+    let startDate;
+    const sub = service.message$.subscribe(
+      () => {
+        count++;
+        if (count === 1) {
+          startDate = Date.now()
+        } else if (count === 2) {
+          expect(Date.now() - startDate).toBe(delayBetMsgs);
+        }
+      },
+      (err) => {
+        fail("Should not fail, err = " + err);
+      }
+    )
+    tick(2 * delayBetMsgs);
+    sub.unsubscribe();
+    expect(count).toBe(2);
+  }));
 });

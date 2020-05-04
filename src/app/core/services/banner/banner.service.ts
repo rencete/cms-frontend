@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, BehaviorSubject, timer, empty, asapScheduler } from 'rxjs';
+import { map, distinctUntilChanged, throttle } from 'rxjs/operators';
 import { nanoid } from "nanoid";
 
 import { BannerData } from '@app/core/models/banner-data.model';
@@ -9,9 +9,8 @@ import { BannerData } from '@app/core/models/banner-data.model';
   providedIn: 'root'
 })
 export class BannerService {
+  public readonly DISMISS_TO_NEXT_DATA_DELAY = 550;
   public message$: Observable<BannerData>;
-
-  private readonly DISMISS_TO_NEXT_DATA_DELAY = 550;
 
   private currentMsg: BehaviorSubject<BannerMessage>;
   private queuedMsgs: Array<BannerMessage>;
@@ -19,9 +18,23 @@ export class BannerService {
   constructor() {
     this.queuedMsgs = new Array<BannerMessage>();
     this.currentMsg = new BehaviorSubject<BannerMessage>(null);
-    this.message$ = this.currentMsg.asObservable().pipe(
+    this.message$ = this.buildMessageObservable();
+  }
+
+  private buildMessageObservable(): Observable<BannerData> {
+    const source$ = this.currentMsg.asObservable();
+    const throttledObs$ = source$.pipe(
+      throttle((val) => {
+        if (val === null) {
+          return timer(this.DISMISS_TO_NEXT_DATA_DELAY);
+        } else {
+          return empty(asapScheduler)
+        }
+      }, { leading: true, trailing: true }),
+      distinctUntilChanged(),
       map((msg) => this.mapMessageToData(msg))
-    )
+    );
+    return throttledObs$;
   }
 
   private mapMessageToData(msg: BannerMessage): BannerData {
@@ -79,7 +92,7 @@ export class BannerService {
       }
       setTimeout(() => {
         this.sendNextMessage();
-      }, this.DISMISS_TO_NEXT_DATA_DELAY);
+      });
     }
   }
 
