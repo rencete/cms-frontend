@@ -78,9 +78,7 @@ describe('ErrorFacade', () => {
   it('should send error response from remote logging to error store', () => {
     const errorResponse = new HttpErrorResponse({ status: 404, statusText: "Test Error" })
     mockRemoteLog.remoteLog.and.callFake(() => {
-      console.log("here");
       return new Observable<any>((s) => {
-        console.log(s);
         s.error(errorResponse);
       });
     });

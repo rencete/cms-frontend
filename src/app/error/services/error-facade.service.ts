@@ -37,7 +37,6 @@ export class ErrorFacade {
     obs.subscribe(
       () => { },
       (errorResponse) => {
-        console.log(errorResponse);
         this.addToStore(errorResponse);
       }
     );
