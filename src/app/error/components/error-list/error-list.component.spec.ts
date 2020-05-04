@@ -1,4 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import { ErrorListComponent } from './error-list.component';
 import { ErrorData } from '@app/error/models/error-data.model';
@@ -29,6 +30,7 @@ describe('ErrorListComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
       declarations: [
         ErrorListComponent
       ]

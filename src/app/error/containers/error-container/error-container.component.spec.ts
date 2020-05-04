@@ -1,4 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { ErrorContainerComponent } from './error-container.component';
@@ -41,6 +42,7 @@ describe('ErrorContainerComponent', () => {
     });
 
     TestBed.configureTestingModule({
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
       declarations: [ ErrorContainerComponent ],
       providers: [
         { provide: ErrorFacade, useValue: mockFacade }
