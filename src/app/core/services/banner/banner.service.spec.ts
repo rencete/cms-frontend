@@ -170,4 +170,73 @@ describe('BannerService', () => {
     sub.unsubscribe();
     expect(count).toBe(2);
   }));
+
+  it('should ignore messages during the delay except the last', fakeAsync(() => {
+    tick(delayBetMsgs);
+    service.addMessage("msg1", "msg1", "msg1", () => {});
+    const msgId1 = service.addMessage("msg2", "msg2", "msg2", () => {});
+    const msgId2 = service.addMessage("msg2", "msg2", "msg2", () => {});
+    const msgId3 = service.addMessage("msg2", "msg2", "msg2", () => {});
+    service.addMessage(msgText, iconText, confirmText, confirmCb, dismissText, dismissCb);
+    tick();
+
+    service.dismissMessage();
+    let count = 0;
+    const sub = service.message$.subscribe(
+      (msg) => {
+        count++;
+        if (count === 2) {
+          expect(msg.show).toBe(true);
+          expect(msg.text).toBe(msgText);
+          expect(msg.icon).toBe(iconText);
+          expect(msg.confirmBtnTxt).toBe(confirmText);
+          expect(msg.dismissBtnTxt).toBe(dismissText);
+        }
+      },
+      (err) => {
+        fail("Should not fail, err = " + err);
+      }
+    )
+    tick(10);
+    service.cancelMessage(msgId1);
+    tick(10);
+    service.cancelMessage(msgId2);
+    tick(10);
+    service.cancelMessage(msgId3);
+    tick(delayBetMsgs - 30);
+
+    sub.unsubscribe();
+    expect(count).toBe(2);
+  }));
+
+  it('should ignore messages if all of them were cancelled', fakeAsync(() => {
+    tick(delayBetMsgs);
+    service.addMessage("msg1", "msg1", "msg1", () => {});
+    const msgId1 = service.addMessage("msg2", "msg2", "msg2", () => {});
+    const msgId2 = service.addMessage("msg3", "msg3", "msg3", () => {});
+    const msgId3 = service.addMessage("msg4", "msg4", "msg4", () => {});
+    tick();
+
+    service.dismissMessage();
+    let count = 0;
+    const sub = service.message$.subscribe(
+      (msg) => {
+        count++;
+        expect(msg.show).toBe(false);
+      },
+      (err) => {
+        fail("Should not fail, err = " + err);
+      }
+    )
+    tick(10);
+    service.cancelMessage(msgId1);
+    tick(10);
+    service.cancelMessage(msgId2);
+    tick(10);
+    service.cancelMessage(msgId3);
+    tick(delayBetMsgs);
+
+    sub.unsubscribe();
+    expect(count).toBe(1);
+  }));
 });
