@@ -13,12 +13,12 @@ import { BannerService } from '@app/core/services/banner/banner.service';
   animations: [
     trigger('slideInOut', [
       transition(':enter', [
-        style({ transform: 'translateY(-150px)' }),
+        style({ height: '0px' }),
         animate("250ms cubic-bezier(0.0,0.0,0.2,1)")
       ]),
       transition(':leave', [
         animate("200ms cubic-bezier(0.4,0.0,1,1)",
-        style({ transform: 'translateY(-150px)' }))
+        style({ height: '0px' }))
       ])
     ])
   ]
