@@ -1,19 +1,24 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
+import { Router } from '@angular/router';
 
 import { BannerService } from '../banner/banner.service';
 import { ErrorFacade } from '@app/error/services/error-facade.service';
 import { ErrorData } from '@app/error/models/error-data.model';
-import { filter } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
-export class ErrorToBannerService implements OnDestroy{
+export class ErrorToBannerService implements OnDestroy {
   private bannerId: string = "";
   private sub: Subscription;
 
-  constructor(private banner: BannerService, private errorFacade: ErrorFacade) {
+  constructor(
+    private banner: BannerService,
+    private errorFacade: ErrorFacade,
+    private router: Router
+  ) {
     this.sub = this.errorFacade.getUnreadErrors().pipe(
       filter((val) => this.shouldFilter(val))
     ).subscribe(
@@ -27,7 +32,9 @@ export class ErrorToBannerService implements OnDestroy{
           this.bannerId = this.banner.addMessage(
             "Oops, application encountered some error(s)",
             "error",
-            "VIEW ERROR", undefined,
+            "VIEW ERROR", () => {
+              this.router.navigateByUrl("/error");
+            },
             "DISMISS", undefined);
         }
       }
