@@ -1,10 +1,14 @@
 <ng-container *ngIf="message$ | async as message">
-    <div *ngIf="message.show" @slideInOut class="banner" [class.banner--mobile]="isHandset$ | async">
-        <div class="banner__message">
-            <mat-icon *ngIf="message.icon">{{message.icon}}</mat-icon>
-            <p>{{message.text}}</p>
-            <button *ngIf="message.dismissBtnTxt" (click)="dismissAction()">{{message.dismissBtnTxt}}</button>
-            <button *ngIf="message.confirmBtnTxt" (click)="confirmAction()">{{message.confirmBtnTxt}}</button>
+    <div fxLayout='row nowrap' fxLayoutAlign='start end' *ngIf="message.show" @slideInOut class="banner">
+        <div fxLayout='row wrap' fxLayoutAlign='start center' class="banner__message">
+            <div fxLayout='row nowrap' fxLayoutAlign='start center'>
+                <mat-icon *ngIf="message.icon">{{message.icon}}</mat-icon>
+                <p>{{message.text}}</p>
+            </div>
+            <div fxLayout='row nowrap' fxFlex='none'>
+                <button mat-button color="primary" *ngIf="message.dismissBtnTxt" (click)="dismissAction()">{{message.dismissBtnTxt}}</button>
+                <button mat-button color="primary" *ngIf="message.confirmBtnTxt" (click)="confirmAction()">{{message.confirmBtnTxt}}</button>
+            </div>
         </div>
     </div>
 </ng-container>

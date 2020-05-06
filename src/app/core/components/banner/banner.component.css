@@ -1,15 +1,42 @@
 .banner {
     border-bottom: solid 2px rgba(0,0,0,.12);
-    position: relative;
-    height: 72px;
-}
-
-.banner--mobile {
-    height: 120px;
+    width: 100%;
 }
 
 .banner__message {
-    position: absolute;
-    bottom: 0;
-    left: 0;
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 16px 8px 8px 16px;
+}
+
+.banner__message p {
+    font-size: 14px;
+    line-height: 20px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+.banner__message div:first-child {
+    margin-right: 24px;
+}
+
+.banner__message div:last-child {
+    margin-left: auto;
+}
+
+.banner__message div:last-child :not(:first-child) {
+    margin-left: 8px;
+}
+
+.banner__message button {
+    height: 36px;
+    text-transform: uppercase;
+}
+
+.banner__message mat-icon {
+    margin-right: 16px;
+    width: 40px;
+    height: 40px;
+    font-size: 40px;
 }
