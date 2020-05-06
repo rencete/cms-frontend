@@ -1,5 +1,5 @@
 <ng-container *ngIf="message$ | async as message">
-    <div *ngIf="message.show" @slideInOut class="banner">
+    <div *ngIf="message.show" @slideInOut class="banner" [class.banner--mobile]="isHandset$ | async">
         <div class="banner__message">
             <mat-icon *ngIf="message.icon">{{message.icon}}</mat-icon>
             <p>{{message.text}}</p>

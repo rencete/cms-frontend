@@ -25,6 +25,7 @@ import { BannerService } from '@app/core/services/banner/banner.service';
 })
 export class BannerComponent implements OnInit {
   @Input() message$: Observable<BannerData>;
+  @Input() isHandset$: Observable<boolean>;
 
   constructor(private service: BannerService) { }
 
