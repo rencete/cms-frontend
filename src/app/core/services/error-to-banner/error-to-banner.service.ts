@@ -30,12 +30,12 @@ export class ErrorToBannerService implements OnDestroy {
           this.bannerId = "";
         } else {
           this.bannerId = this.banner.addMessage(
-            "Oops, application encountered some error(s)",
+            "Oops, this application has encountered some error(s).",
             "error",
-            "VIEW ERROR", () => {
+            "View error", () => {
               this.router.navigateByUrl("/error");
             },
-            "DISMISS", undefined);
+            "Dismiss", undefined);
         }
       }
     );
