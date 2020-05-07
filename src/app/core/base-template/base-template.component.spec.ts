@@ -10,12 +10,15 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterTestingModule } from "@angular/router/testing";
 
 import { BaseTemplateComponent } from './base-template.component';
+import { ErrorToBannerService } from '../services/error-to-banner/error-to-banner.service';
 
 describe('BaseTemplateComponent', () => {
   let component: BaseTemplateComponent;
   let fixture: ComponentFixture<BaseTemplateComponent>;
 
   beforeEach(async(() => {
+    const mockErrToBanner = jasmine.createSpy("ErrorToBannerService");
+
     TestBed.configureTestingModule({
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       declarations: [BaseTemplateComponent],
@@ -28,6 +31,9 @@ describe('BaseTemplateComponent', () => {
         MatListModule,
         MatSidenavModule,
         MatToolbarModule,
+      ],
+      providers: [
+        { provide: ErrorToBannerService, useValue: mockErrToBanner }
       ]
     }).compileComponents();
   }));

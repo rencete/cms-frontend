@@ -5,6 +5,7 @@ import { ErrorToBannerService } from './error-to-banner.service';
 import { ErrorFacade } from '@app/error/services/error-facade.service';
 import { BannerService } from '../banner/banner.service';
 import { ErrorData } from '@app/error/models/error-data.model';
+import { RouterTestingModule } from '@angular/router/testing';
 
 describe('ErrorToBannerService', () => {
   let service: ErrorToBannerService;
@@ -38,6 +39,9 @@ describe('ErrorToBannerService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
+      imports: [
+        RouterTestingModule
+      ],
       providers: [
         { provide: ErrorFacade, useValue: mockFacade },
         { provide: BannerService, useValue: mockBanner }
