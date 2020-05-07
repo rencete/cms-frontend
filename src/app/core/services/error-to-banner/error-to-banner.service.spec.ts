@@ -93,4 +93,14 @@ describe('ErrorToBannerService', () => {
     mockErrors$.next([testError]);
     expect(mockBanner.addMessage).toHaveBeenCalledTimes(1);
   }));
+
+  it('should not send new message when number of errors is going down, even if message was dismissed', fakeAsync(() => {
+    mockErrors$.next([testError, testError, testError]);
+    tick(10);
+    mockBanner.hasMessage.and.returnValue(false);
+    tick(10);
+    mockBanner.addMessage.calls.reset();
+    mockErrors$.next([testError, testError]);
+    expect(mockBanner.addMessage).not.toHaveBeenCalled();
+  }));
 });

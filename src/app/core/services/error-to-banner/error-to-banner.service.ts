@@ -13,6 +13,7 @@ import { ErrorData } from '@app/error/models/error-data.model';
 export class ErrorToBannerService implements OnDestroy {
   private bannerId: string = "";
   private sub: Subscription;
+  private previousCount = 0;
 
   constructor(
     private banner: BannerService,
@@ -20,7 +21,7 @@ export class ErrorToBannerService implements OnDestroy {
     private router: Router
   ) {
     this.sub = this.errorFacade.getUnreadErrors().pipe(
-      filter((val) => this.shouldFilter(val))
+      filter((val) => this.shouldPassFilter(val))
     ).subscribe(
       (errors) => {
         if (errors.length === 0) {
@@ -41,7 +42,12 @@ export class ErrorToBannerService implements OnDestroy {
     );
   }
 
-  shouldFilter(arr: ErrorData[]): boolean {
+  shouldPassFilter(arr: ErrorData[]): boolean {
+    if (arr.length > 0 && arr.length < this.previousCount) {
+      return false;
+    }
+    this.previousCount = arr.length;
+
     if (arr.length > 0 &&
       this.bannerId &&
       this.banner.hasMessage(this.bannerId)) {
