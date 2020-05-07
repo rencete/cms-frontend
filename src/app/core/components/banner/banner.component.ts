@@ -1,8 +1,10 @@
 import { Component, Input, ChangeDetectionStrategy, Output, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs';
-import { trigger, transition, style, animate } from '@angular/animations';
+import { trigger, transition, useAnimation } from '@angular/animations';
 
 import { BannerData } from '@app/core/models/banner-data.model';
+import { growFrom0ToSize } from '@app/shared/animations/grow-from-0-to-size.animation';
+import { shrinkFromSizeTo0 } from '@app/shared/animations/shrink-from-size-to-0.animation';
 
 @Component({
   selector: 'cms-banner',
@@ -12,12 +14,14 @@ import { BannerData } from '@app/core/models/banner-data.model';
   animations: [
     trigger('slideInOut', [
       transition(':enter', [
-        style({ height: '0px' }),
-        animate("250ms cubic-bezier(0.0,0.0,0.2,1)")
+        useAnimation(growFrom0ToSize, {
+          params: { time: '250ms' }
+        })
       ]),
       transition(':leave', [
-        animate("200ms cubic-bezier(0.4,0.0,1,1)",
-        style({ height: '0px' }))
+        useAnimation(shrinkFromSizeTo0, {
+          params: { time: '200ms' }
+        })
       ])
     ])
   ]
