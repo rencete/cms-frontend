@@ -5,26 +5,18 @@ import { Subject } from 'rxjs';
 
 import { BannerComponent } from './banner.component';
 import { BannerData } from '@app/core/models/banner-data.model';
-import { BannerService } from '@app/core/services/banner/banner.service';
 
 describe('BannerComponent', () => {
   let component: BannerComponent;
   let fixture: ComponentFixture<BannerComponent>;
   let componentNativeElement: HTMLElement;
-  let mockService: {
-    message$: Subject<BannerData>,
-    dismissMessage: jasmine.Spy,
-    confirmMessage: jasmine.Spy
-  }
   let messageText: string = "This is a test banner text.";
   let iconText: string = "Icon";
   let confirmBtnText: string = "CONFIRM TEXT";
   let dismissBtnText: string = "DISMISS TEXT";
+  let input$: Subject<BannerData>;
 
   beforeEach(async(() => {
-    mockService = jasmine.createSpyObj("BannerService", ["dismissMessage", "confirmMessage"]);
-    mockService.message$ = new Subject<BannerData>();
-
     TestBed.configureTestingModule({
       imports: [
         NoopAnimationsModule,
@@ -32,9 +24,6 @@ describe('BannerComponent', () => {
       ],
       declarations: [
         BannerComponent
-      ],
-      providers: [
-        { provide: BannerService, useValue: mockService }
       ]
     })
       .compileComponents();
@@ -43,19 +32,21 @@ describe('BannerComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(BannerComponent);
     component = fixture.componentInstance;
+    input$ = new Subject<BannerData>();
+    component.message$ = input$.asObservable();
     componentNativeElement = fixture.debugElement.nativeElement;
     fixture.detectChanges();
   });
 
   it('should not display if message.show = false', () => {
-    mockService.message$.next({ show: false });
+    input$.next({ show: false });
     fixture.detectChanges();
     const divElement = componentNativeElement.querySelector("div");
     expect(divElement).toBeFalsy();
   });
 
   it('should display if message.show = true', () => {
-    mockService.message$.next({
+    input$.next({
       show: true
     });
     fixture.detectChanges();
@@ -65,7 +56,7 @@ describe('BannerComponent', () => {
   });
 
   it('should display correct texts', () => {
-    mockService.message$.next({
+    input$.next({
       show: true,
       icon: iconText,
       text: messageText,
@@ -83,8 +74,8 @@ describe('BannerComponent', () => {
     expect(buttonElements[1].textContent).toEqual(confirmBtnText);
   });
 
-  it('should display not display icon if icon text is not provided', () => {
-    mockService.message$.next({
+  it('should not display icon if icon text is not provided', () => {
+    input$.next({
       show: true,
       icon: "",
       text: messageText,
@@ -97,8 +88,8 @@ describe('BannerComponent', () => {
     expect(iconElement).toBeFalsy();
   });
 
-  it('should display not display dismiss button if dismiss text is not provided', () => {
-    mockService.message$.next({
+  it('should not display dismiss button if dismiss text is not provided', () => {
+    input$.next({
       show: true,
       icon: iconText,
       text: messageText,
@@ -112,8 +103,8 @@ describe('BannerComponent', () => {
     expect(buttonElements[0].textContent).toEqual(confirmBtnText);
   });
 
-  it('should display not display confirm button if confirm text is not provided', () => {
-    mockService.message$.next({
+  it('should not display confirm button if confirm text is not provided', () => {
+    input$.next({
       show: true,
       icon: iconText,
       text: messageText,
@@ -127,8 +118,18 @@ describe('BannerComponent', () => {
     expect(buttonElements[buttonElements.length-1].textContent).toEqual(dismissBtnText);
   });
 
-  it('should call banner service dismissMessage when clicking dismiss button', () => {
-    mockService.message$.next({
+  it('should emit dismiss event when clicking dismiss button', async(() => {
+    let count = 0;
+    component.dismiss.subscribe(
+      () => {
+        count++;
+      },
+      (err) => {
+        fail("Should not error, err = " + err);
+      }
+    )
+
+    input$.next({
       show: true,
       text: messageText,
       dismissBtnTxt: dismissBtnText
@@ -137,12 +138,21 @@ describe('BannerComponent', () => {
     const dismissBtnElement = componentNativeElement.querySelector("button");
     dismissBtnElement.click();
     fixture.detectChanges();
+    expect(count).toBe(1);
+  }));
 
-    expect(mockService.dismissMessage).toHaveBeenCalledTimes(1);
-  });
+  it('should emit confirm event when clicking confirm button', () => {
+    let count = 0;
+    component.confirm.subscribe(
+      () => {
+        count++;
+      },
+      (err) => {
+        fail("Should not error, err = " + err);
+      }
+    )
 
-  it('should call banner service confirmMessage when clicking confirm button', () => {
-    mockService.message$.next({
+    input$.next({
       show: true,
       text: messageText,
       confirmBtnTxt: confirmBtnText
@@ -152,6 +162,6 @@ describe('BannerComponent', () => {
     confirmBtnElement.click();
     fixture.detectChanges();
 
-    expect(mockService.confirmMessage).toHaveBeenCalledTimes(1);
+    expect(count).toBe(1);
   });
 });

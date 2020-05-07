@@ -1,9 +1,8 @@
-import { Component, OnInit, Input, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy, Output, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs';
 import { trigger, transition, style, animate } from '@angular/animations';
 
 import { BannerData } from '@app/core/models/banner-data.model';
-import { BannerService } from '@app/core/services/banner/banner.service';
 
 @Component({
   selector: 'cms-banner',
@@ -23,20 +22,16 @@ import { BannerService } from '@app/core/services/banner/banner.service';
     ])
   ]
 })
-export class BannerComponent implements OnInit {
+export class BannerComponent {
   @Input() message$: Observable<BannerData>;
-
-  constructor(private service: BannerService) { }
-
-  ngOnInit(): void {
-    this.message$ = this.service.message$;
-  }
+  @Output() dismiss = new EventEmitter();
+  @Output() confirm = new EventEmitter();
 
   dismissAction(): void {
-    this.service.dismissMessage();
+    this.dismiss.emit();
   }
 
   confirmAction(): void {
-    this.service.confirmMessage();
+    this.confirm.emit();
   }
 }
